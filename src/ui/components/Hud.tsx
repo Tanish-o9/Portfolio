@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Sun, Moon, ArrowRight, HelpCircle } from 'lucide-react';
+import { Volume2, VolumeX, Sun, Moon, HelpCircle } from 'lucide-react';
 import { useGameStore } from '../../state/gameStore';
 import { soundEffects } from '../../game/systems/soundEffects';
 import { HelpModal } from './HelpModal';
 
 export const Hud: React.FC = () => {
-  const { visitedPlaces, muted, toggleMute, season, toggleSeason, setMode } = useGameStore();
+  const { visitedPlaces, muted, toggleMute, season, toggleSeason } = useGameStore();
   const [showHelp, setShowHelp] = useState(false);
   const totalPlaces = 8;
 
@@ -17,11 +17,6 @@ export const Hud: React.FC = () => {
   const handleSeasonToggle = () => {
     toggleSeason();
     soundEffects.playClick();
-  };
-
-  const handleSkip = () => {
-    soundEffects.playClick();
-    setMode('classic');
   };
 
   return (
@@ -68,16 +63,6 @@ export const Hud: React.FC = () => {
             className="h-10 w-10 bg-[#FFF6E3] border-2 border-[#3A2A1E] rounded-xl shadow-[0_3px_0_#3A2A1E] text-xs font-bold text-[#3A2A1E] flex items-center justify-center hover:bg-white active:translate-y-0.5 active:shadow-none transition-all"
           >
             <HelpCircle className="w-4 h-4" />
-          </button>
-
-          {/* Skip the village button */}
-          <button
-            onClick={handleSkip}
-            aria-label="Switch to standard classic portfolio view"
-            className="h-10 px-4 bg-[#F6B73C] border-2 border-[#3A2A1E] rounded-xl shadow-[0_3px_0_#3A2A1E] text-xs sm:text-sm font-bold text-[#3A2A1E] flex items-center gap-1.5 hover:bg-[#ffc652] active:translate-y-0.5 active:shadow-none transition-all"
-          >
-            <span>Skip the village</span>
-            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </header>

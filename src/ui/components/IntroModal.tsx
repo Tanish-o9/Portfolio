@@ -5,7 +5,7 @@ import { ArrowRight, Volume2 } from 'lucide-react';
 
 export const IntroModal: React.FC = () => {
   const [hasEntered, setHasEntered] = useState(false);
-  const { setMode, toggleMute, muted } = useGameStore();
+  const { toggleMute, muted } = useGameStore();
 
   useEffect(() => {
     try {
@@ -32,11 +32,6 @@ export const IntroModal: React.FC = () => {
     }
   };
 
-  const handleSkip = () => {
-    setHasEntered(true);
-    setMode('classic');
-  };
-
   if (hasEntered) return null;
 
   return (
@@ -55,21 +50,14 @@ export const IntroModal: React.FC = () => {
           An interactive 2D portfolio world exploring AI engineering, LLM inference optimization, and practical ML systems.
         </p>
 
-        {/* Buttons */}
-        <div className="space-y-3 mb-6">
+        {/* Button */}
+        <div className="mb-6">
           <button
             onClick={handleEnter}
             className="w-full py-3.5 px-6 bg-[#F6B73C] hover:bg-[#ffc652] text-[#3A2A1E] font-extrabold text-base rounded-2xl border-[3px] border-[#3A2A1E] shadow-[0_4px_0_#3A2A1E] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2"
           >
             <span>Enter the Village</span>
             <ArrowRight className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={handleSkip}
-            className="w-full py-3 px-6 bg-white hover:bg-[#FFF1D6] text-[#3A2A1E] font-bold text-sm rounded-2xl border-2 border-[#3A2A1E] shadow-[0_3px_0_#3A2A1E] active:translate-y-1 active:shadow-none transition-all"
-          >
-            Skip to Classic Portfolio View
           </button>
         </div>
 
