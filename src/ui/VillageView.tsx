@@ -18,6 +18,9 @@ import { EducationPanel } from './panels/EducationPanel';
 import { ContactPanel } from './panels/ContactPanel';
 import { ResumePanel } from './panels/ResumePanel';
 import { GuestbookPanel } from './panels/GuestbookPanel';
+import { TerminalPanel } from './panels/TerminalPanel';
+import { AiChatPanel } from './panels/AiChatPanel';
+import { Bot } from 'lucide-react';
 
 export const VillageView: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -55,6 +58,10 @@ export const VillageView: React.FC = () => {
         return 'Notice Board: Resume';
       case 'guestbook':
         return 'Town Square Guestbook';
+      case 'terminal':
+        return 'GitHub Workshop: Interactive Terminal';
+      case 'ai-chat':
+        return 'Tanish AI Companion';
       default:
         return 'Village Place';
     }
@@ -69,7 +76,7 @@ export const VillageView: React.FC = () => {
       <div
         id="phaser-container"
         ref={containerRef}
-        className="w-full h-full flex items-center justify-center"
+        className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
       />
 
       {/* Day / Evening Tint Overlay */}
@@ -84,6 +91,19 @@ export const VillageView: React.FC = () => {
       <Hud />
       <Minimap />
       <Joystick />
+
+      {/* Floating Quick Action: Tanish AI Assistant */}
+      <div className="fixed bottom-6 left-6 z-30 pointer-events-auto">
+        <button
+          onClick={() => openPanel('ai-chat')}
+          className="flex items-center gap-2 px-3.5 py-2.5 bg-[#FFF6E3] hover:bg-[#FFF] border-2 border-[#3A2A1E] rounded-2xl shadow-[0_4px_0_#3A2A1E] text-xs font-bold text-[#3A2A1E] transition-transform active:translate-y-1 hover:scale-105"
+          title="Chat with Tanish AI"
+        >
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+          <Bot className="w-4 h-4 text-[#266F73]" />
+          <span>Ask Tanish AI</span>
+        </button>
+      </div>
 
       {/* Progress Reward Banner (when all 8 places are visited) */}
       {visitedPlaces.length >= 8 && (
@@ -119,6 +139,8 @@ export const VillageView: React.FC = () => {
         {activePanel === 'contact' && <ContactPanel />}
         {activePanel === 'resume' && <ResumePanel />}
         {activePanel === 'guestbook' && <GuestbookPanel />}
+        {activePanel === 'terminal' && <TerminalPanel />}
+        {activePanel === 'ai-chat' && <AiChatPanel />}
       </Modal>
     </div>
   );

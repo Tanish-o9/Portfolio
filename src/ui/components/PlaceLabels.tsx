@@ -7,12 +7,13 @@ export const PlaceLabels: React.FC = () => {
 
   const handlePlaceClick = (place: Place) => {
     markVisited(place.id);
+    if (place.panel) {
+      openPanel(place.panel, place.projectId);
+      return;
+    }
     if (place.externalUrl) {
       window.open(place.externalUrl, '_blank', 'noopener,noreferrer');
       return;
-    }
-    if (place.panel) {
-      openPanel(place.panel, place.projectId);
     }
   };
 

@@ -2,6 +2,17 @@ import Phaser from 'phaser';
 import { Player } from '../entities/Player';
 import { PLACES, Place } from '../../data/places';
 import { useGameStore } from '../../state/gameStore';
+import { soundEffects } from '../systems/soundEffects';
+
+interface AmbientParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  alpha: number;
+  size: number;
+  type: 'smoke' | 'leaf' | 'firefly' | 'ripple';
+}
 
 export class VillageScene extends Phaser.Scene {
   private player!: Player;
@@ -14,6 +25,14 @@ export class VillageScene extends Phaser.Scene {
   private promptText!: Phaser.GameObjects.Text;
   private promptBg!: Phaser.GameObjects.Rectangle;
   private arrowGraphic!: Phaser.GameObjects.Graphics;
+
+  // Drag-to-pan / cursor slide state
+  private isDragging = false;
+  private dragStartX = 0;
+  private dragStartY = 0;
+  private isFollowActive = true;
+  private fxGraphics!: Phaser.GameObjects.Graphics;
+  private particles: AmbientParticle[] = [];
 
   constructor() {
     super({ key: 'VillageScene' });
@@ -54,8 +73,10 @@ export class VillageScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.obstacles);
 
     // 6. Camera Setup: Lerp follow, clamped to bounds
-    this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
-    this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+    const cam = this.cameras.main;
+    cam.setBounds(0, 0, worldWidth, worldHeight);
+    cam.startFollow(this.player, true, 0.08, 0.08);
+    this.isFollowActive = true;
 
     // 7. Input Controls: E and Enter for interaction
     if (this.input.keyboard) {
@@ -63,24 +84,86 @@ export class VillageScene extends Phaser.Scene {
       this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
     }
 
-    // 8. Pointer Click-to-Move
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      // Convert screen to world coordinate
-      const worldX = pointer.worldX;
-      const worldY = pointer.worldY;
-      this.player.setTarget(worldX, worldY);
-    });
+    // 8. Drag-to-Pan (Cursor slide around village) & Click-to-Move
+    this.setupCameraPanAndZoom();
 
     // 9. Floating Interaction Prompt & Arrow
     this.createInteractionUI();
+
+    // 10. Ambient Visual Effects Graphics
+    this.fxGraphics = this.add.graphics();
+    this.fxGraphics.setDepth(9990);
+    this.initAmbientParticles();
 
     // Listen for Walk Target from store (when pill label is clicked)
     useGameStore.subscribe((state) => {
       if (state.walkTarget) {
         this.player.setTarget(state.walkTarget.x, state.walkTarget.y);
         useGameStore.getState().setWalkTarget(null);
+        this.recenterCamera();
       }
     });
+  }
+
+  private setupCameraPanAndZoom() {
+    const cam = this.cameras.main;
+    const canvas = this.game.canvas;
+    canvas.style.cursor = 'grab';
+
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      this.isDragging = false;
+      this.dragStartX = pointer.x;
+      this.dragStartY = pointer.y;
+      canvas.style.cursor = 'grabbing';
+    });
+
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (!pointer.isDown) return;
+
+      const dx = pointer.x - this.dragStartX;
+      const dy = pointer.y - this.dragStartY;
+
+      // If dragged more than 6 pixels, enter drag-pan mode
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+        this.isDragging = true;
+        if (this.isFollowActive) {
+          cam.stopFollow();
+          this.isFollowActive = false;
+        }
+
+        cam.scrollX -= (pointer.x - pointer.prevPosition.x) / cam.zoom;
+        cam.scrollY -= (pointer.y - pointer.prevPosition.y) / cam.zoom;
+
+        // Clamp camera to world bounds
+        cam.scrollX = Phaser.Math.Clamp(cam.scrollX, 0, 1440 - cam.width / cam.zoom);
+        cam.scrollY = Phaser.Math.Clamp(cam.scrollY, 0, 900 - cam.height / cam.zoom);
+      }
+    });
+
+    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      canvas.style.cursor = 'grab';
+
+      // If not dragging, it's a tap/click-to-move
+      if (!this.isDragging) {
+        const worldX = pointer.worldX;
+        const worldY = pointer.worldY;
+        this.player.setTarget(worldX, worldY);
+        this.recenterCamera();
+      }
+    });
+
+    // Mouse wheel zoom
+    this.input.on('wheel', (_pointer: Phaser.Input.Pointer, _gameObjects: unknown, _deltaX: number, deltaY: number) => {
+      const newZoom = Phaser.Math.Clamp(cam.zoom - deltaY * 0.001, 0.75, 1.35);
+      cam.setZoom(newZoom);
+    });
+  }
+
+  private recenterCamera() {
+    if (!this.isFollowActive) {
+      this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+      this.isFollowActive = true;
+    }
   }
 
   private drawRoadNetwork() {
@@ -89,21 +172,13 @@ export class VillageScene extends Phaser.Scene {
     road.lineStyle(3, 0xbdae92, 1);
 
     const roads = [
-      // Horizontal Main Road at y=520 (full width, 48px height)
       { x: 0, y: 496, w: 1440, h: 48 },
-      // Vertical Road at x=700 (y: 220 to 830, 48px width)
       { x: 676, y: 220, w: 48, h: 610 },
-      // Road to Home (x: 208, y: 290 to 520)
       { x: 184, y: 290, w: 48, h: 230 },
-      // Road to CCC Tower (x: 1165, y: 250 to 520)
       { x: 1141, y: 250, w: 48, h: 270 },
-      // Road to College (x: 208, y: 520 to 800)
       { x: 184, y: 520, w: 48, h: 280 },
-      // Road to Workshop (x: 1060, y: 520 to 790)
       { x: 1036, y: 520, w: 48, h: 270 },
-      // Project Street at y=412 (x: 700 to 1400)
       { x: 700, y: 396, w: 700, h: 36 },
-      // Town Square Plaza around (580 to 740, y: 320 to 496)
       { x: 540, y: 330, w: 180, h: 170 },
     ];
 
@@ -126,7 +201,6 @@ export class VillageScene extends Phaser.Scene {
       img.setOrigin(0, 0);
       img.setDepth(y + img.height - 10);
 
-      // Add physical collision box to base of building
       const obs = this.obstacles.create(
         x + img.width / 2,
         y + img.height - colliderH / 2,
@@ -139,7 +213,6 @@ export class VillageScene extends Phaser.Scene {
       if (placeId) {
         const place = PLACES.find((p) => p.id === placeId);
         if (place) {
-          // Entrance zone rectangle
           const zoneBounds = new Phaser.Geom.Rectangle(
             place.doorPoint.x - 30,
             place.doorPoint.y - 30,
@@ -151,38 +224,22 @@ export class VillageScene extends Phaser.Scene {
       }
     };
 
-    // 1. Home (About) top-left
+    // Buildings
     addBuildingObject('bldg_home', 100, 90, 120, 60, 'home');
-
-    // 2. Library (Skills) top-center
     addBuildingObject('bldg_library', 570, 50, 160, 65, 'library');
-
-    // 3. CCC Tower (Experience) top-right
     addBuildingObject('bldg_tower', 1090, 20, 100, 70, 'cloud-tower');
-
-    // 4. Project Street (5 small houses)
     addBuildingObject('bldg_quantora', 770, 280, 80, 45, 'project-quantora');
     addBuildingObject('bldg_pramaan', 895, 280, 80, 45, 'project-pramaan');
     addBuildingObject('bldg_whytrace', 1020, 280, 80, 45, 'project-whytrace');
     addBuildingObject('bldg_data_engine', 1145, 280, 80, 45, 'project-data-engine');
     addBuildingObject('bldg_mini_vlm', 1270, 280, 80, 45, 'project-mini-vlm');
-
-    // 5. College (bottom-left)
     addBuildingObject('bldg_college', 100, 610, 140, 65, 'college');
-
-    // 6. Post Office (bottom-center)
     addBuildingObject('bldg_post_office', 605, 655, 120, 50, 'post-office');
-
-    // 7. GitHub Workshop (bottom-right)
     addBuildingObject('bldg_workshop', 960, 640, 110, 50, 'workshop-sign');
-
-    // 8. Notice Board
     addBuildingObject('prop_notice_board', 400, 380, 50, 25, 'notice-board');
-
-    // 9. Guestbook Stand
     addBuildingObject('prop_guestbook', 580, 330, 40, 25, 'guestbook-stand');
 
-    // 10. Pond (Solid obstacle)
+    // Pond
     const pondImg = this.add.image(1290, 720, 'prop_pond');
     pondImg.setOrigin(0.5, 0.5);
     pondImg.setDepth(720);
@@ -191,19 +248,14 @@ export class VillageScene extends Phaser.Scene {
     pondObs.setSize(100, 70);
     pondObs.refreshBody();
 
-    // 11. Street Lamps
-    [
-      [651, 448],
-      [751, 448],
-      [651, 600],
-      [751, 600],
-    ].forEach(([lx, ly]) => {
+    // Street Lamps
+    [[651, 448], [751, 448], [651, 600], [751, 600]].forEach(([lx, ly]) => {
       const lamp = this.add.image(lx, ly, 'prop_lamp');
       lamp.setOrigin(0.5, 0.9);
       lamp.setDepth(ly);
     });
 
-    // 12. Decorative Trees along perimeter
+    // Trees
     const treeLocs = [
       [50, 40], [320, 60], [440, 80], [820, 40], [980, 40],
       [40, 380], [40, 520], [40, 820], [420, 820], [840, 830],
@@ -214,23 +266,116 @@ export class VillageScene extends Phaser.Scene {
       const tree = this.add.image(tx, ty, key);
       tree.setOrigin(0.5, 0.9);
       tree.setDepth(ty);
-      // Trunk collider
       const trunk = this.obstacles.create(tx, ty, undefined) as Phaser.Physics.Arcade.Sprite;
       trunk.setVisible(false);
       trunk.setSize(20, 14);
       trunk.refreshBody();
     });
 
-    // 13. Ambient NPCs
-    // Librarian near Library (650, 220)
+    // NPCs
+    // 1. Tanish AI Companion in Town Square
+    const aiNpc = this.add.image(685, 390, 'npc_tanish_ai');
+    aiNpc.setOrigin(0.5, 0.9);
+    aiNpc.setDepth(390);
+    const aiPlace = PLACES.find((p) => p.id === 'tanish-ai-npc');
+    if (aiPlace) {
+      this.zoneBoxes.push({
+        place: aiPlace,
+        bounds: new Phaser.Geom.Rectangle(685 - 30, 390 - 30, 60, 60),
+      });
+    }
+
+    // 2. Librarian near Library
     const libNpc = this.add.image(640, 220, 'npc_librarian');
     libNpc.setOrigin(0.5, 0.9);
     libNpc.setDepth(220);
 
-    // Postmaster near Post Office (760, 760)
+    // 3. Postmaster near Post Office
     const postNpc = this.add.image(760, 760, 'npc_postmaster');
     postNpc.setOrigin(0.5, 0.9);
     postNpc.setDepth(760);
+  }
+
+  private initAmbientParticles() {
+    // 1. Chimney smoke particles
+    for (let i = 0; i < 6; i++) {
+      this.particles.push({
+        x: 202 + (Math.random() - 0.5) * 6,
+        y: 80 - i * 12,
+        vx: 0.15 + Math.random() * 0.1,
+        vy: -0.4 - Math.random() * 0.2,
+        alpha: 0.6 - i * 0.08,
+        size: 5 + i * 2,
+        type: 'smoke',
+      });
+    }
+
+    // 2. Drifting leaves
+    for (let i = 0; i < 8; i++) {
+      this.particles.push({
+        x: Math.random() * 1440,
+        y: Math.random() * 900,
+        vx: 0.6 + Math.random() * 0.4,
+        vy: 0.3 + Math.random() * 0.2,
+        alpha: 0.7,
+        size: 4,
+        type: 'leaf',
+      });
+    }
+
+    // 3. Fireflies / evening glow
+    for (let i = 0; i < 10; i++) {
+      this.particles.push({
+        x: 600 + Math.random() * 200,
+        y: 400 + Math.random() * 220,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        alpha: 0.8,
+        size: 3,
+        type: 'firefly',
+      });
+    }
+  }
+
+  private updateAmbientParticles() {
+    const isEvening = useGameStore.getState().season === 'evening';
+    this.fxGraphics.clear();
+
+    for (const p of this.particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.type === 'smoke') {
+        p.alpha -= 0.003;
+        p.size += 0.02;
+        if (p.alpha <= 0.05) {
+          p.x = 202 + (Math.random() - 0.5) * 6;
+          p.y = 80;
+          p.alpha = 0.6;
+          p.size = 5;
+        }
+        this.fxGraphics.fillStyle(0xffffff, p.alpha * 0.5);
+        this.fxGraphics.fillCircle(p.x, p.y, p.size);
+      } else if (p.type === 'leaf') {
+        if (p.x > 1440 || p.y > 900) {
+          p.x = Math.random() * 400;
+          p.y = Math.random() * 200;
+        }
+        this.fxGraphics.fillStyle(0xe8a640, 0.7);
+        this.fxGraphics.fillEllipse(p.x, p.y, p.size * 1.5, p.size);
+      } else if (p.type === 'firefly' && isEvening) {
+        p.vx += (Math.random() - 0.5) * 0.05;
+        p.vy += (Math.random() - 0.5) * 0.05;
+        const pulse = 0.5 + Math.sin(this.time.now / 300) * 0.4;
+        this.fxGraphics.fillStyle(0xf6b73c, pulse);
+        this.fxGraphics.fillCircle(p.x, p.y, p.size);
+      }
+    }
+
+    // Animated pond water ripples
+    const rippleRadius = 20 + Math.sin(this.time.now / 600) * 10;
+    this.fxGraphics.lineStyle(1.5, 0xffffff, 0.35);
+    this.fxGraphics.strokeEllipse(1290, 720, rippleRadius * 2, rippleRadius * 1.2);
   }
 
   private createInteractionUI() {
@@ -238,7 +383,7 @@ export class VillageScene extends Phaser.Scene {
     this.promptContainer.setDepth(9999);
     this.promptContainer.setVisible(false);
 
-    this.promptBg = this.add.rectangle(0, 0, 220, 36, 0xfff6e3);
+    this.promptBg = this.add.rectangle(0, 0, 230, 36, 0xfff6e3);
     this.promptBg.setStrokeStyle(2, 0x3a2a1e);
     this.promptText = this.add.text(0, 0, 'Press E to Enter', {
       fontFamily: 'Inter, sans-serif',
@@ -249,12 +394,10 @@ export class VillageScene extends Phaser.Scene {
 
     this.promptContainer.add([this.promptBg, this.promptText]);
 
-    // Bobbing Arrow
     this.arrowGraphic = this.add.graphics();
     this.arrowGraphic.setDepth(9998);
     this.arrowGraphic.fillStyle(0xf6b73c, 1);
     this.arrowGraphic.lineStyle(2, 0x3a2a1e, 1);
-    // Downward triangle
     this.arrowGraphic.beginPath();
     this.arrowGraphic.moveTo(-8, -16);
     this.arrowGraphic.lineTo(8, -16);
@@ -267,6 +410,12 @@ export class VillageScene extends Phaser.Scene {
 
   update() {
     this.player.update();
+    this.updateAmbientParticles();
+
+    // Re-center follow on player movement
+    if (this.player.body && (this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0)) {
+      this.recenterCamera();
+    }
 
     // Check distance to interactive zones
     let currentNearby: Place | null = null;
@@ -285,25 +434,21 @@ export class VillageScene extends Phaser.Scene {
     }
 
     if (currentNearby) {
-      // Show prompt right above player
       this.promptContainer.setPosition(this.player.x, this.player.y - 40);
       this.promptText.setText(`Press E · Enter ${currentNearby.name}`);
       this.promptContainer.setVisible(true);
 
-      // Show bobbing arrow over the building door
       const bobY = Math.sin(this.time.now / 150) * 4;
       this.arrowGraphic.setPosition(currentNearby.doorPoint.x, currentNearby.doorPoint.y - 20 + bobY);
       this.arrowGraphic.setVisible(true);
 
-      // Check if E or Enter was pressed
       const justE = Phaser.Input.Keyboard.JustDown(this.eKey);
       const justEnter = Phaser.Input.Keyboard.JustDown(this.enterKey);
 
       if (justE || justEnter) {
+        soundEffects.playEnter();
         useGameStore.getState().markVisited(currentNearby.id);
-        if (currentNearby.externalUrl) {
-          window.open(currentNearby.externalUrl, '_blank', 'noopener,noreferrer');
-        } else if (currentNearby.panel) {
+        if (currentNearby.panel) {
           useGameStore.getState().openPanel(currentNearby.panel, currentNearby.projectId);
         }
       }

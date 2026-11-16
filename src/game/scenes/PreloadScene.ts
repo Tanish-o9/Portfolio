@@ -316,6 +316,28 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   private createNpcTextures() {
+    // 1. Tanish AI NPC (Town Square Companion with glowing cyber visor)
+    const aiNpc = this.make.graphics({ x: 0, y: 0 });
+    aiNpc.fillStyle(0x3a2a1e, 1);
+    aiNpc.fillRoundedRect(4, 2, 20, 20, 10);
+    aiNpc.fillRoundedRect(2, 18, 24, 26, 6);
+    aiNpc.fillStyle(0xffdbb5, 1);
+    aiNpc.fillRoundedRect(6, 8, 16, 12, 4);
+    // Glowing cyan visor
+    aiNpc.fillStyle(0x00f0ff, 1);
+    aiNpc.fillRoundedRect(8, 11, 12, 4, 2);
+    // Dark engineer hoodie
+    aiNpc.fillStyle(0x111b2d, 1);
+    aiNpc.fillRoundedRect(4, 20, 20, 16, 4);
+    aiNpc.fillStyle(0x4f8cff, 1);
+    aiNpc.fillRect(13, 20, 2, 16); // Accent zipper
+    aiNpc.fillStyle(0x3a2a1e, 1);
+    aiNpc.fillRect(6, 36, 6, 8);
+    aiNpc.fillRect(16, 36, 6, 8);
+    aiNpc.generateTexture('npc_tanish_ai', 28, 46);
+    aiNpc.destroy();
+
+    // 2. Librarian NPC
     const libNpc = this.make.graphics({ x: 0, y: 0 });
     libNpc.fillStyle(0x3a2a1e, 1);
     libNpc.fillRoundedRect(4, 2, 20, 20, 10);
@@ -330,6 +352,7 @@ export class PreloadScene extends Phaser.Scene {
     libNpc.generateTexture('npc_librarian', 28, 46);
     libNpc.destroy();
 
+    // 3. Postmaster NPC
     const postNpc = this.make.graphics({ x: 0, y: 0 });
     postNpc.fillStyle(0x3a2a1e, 1);
     postNpc.fillRoundedRect(4, 2, 20, 20, 10);

@@ -7,6 +7,8 @@ export type PanelType =
   | 'contact'
   | 'resume'
   | 'guestbook'
+  | 'terminal'
+  | 'ai-chat'
   | null;
 
 export interface PlaceZone {
@@ -158,12 +160,22 @@ export const PLACES: Place[] = [
   {
     id: 'workshop-sign',
     name: 'GitHub Workshop',
-    label: 'GitHub Workshop · Code',
-    panel: null,
+    label: 'GitHub Workshop · Terminal',
+    panel: 'terminal',
     externalUrl: 'https://github.com/Tanish-o9',
     zone: { x: 960, y: 640, width: 130, height: 110 },
     doorPoint: { x: 1060, y: 790 },
     roofColor: '#3A2A1E',
-    description: 'Open source profile and repositories on GitHub.',
+    description: 'Interactive developer terminal & GitHub open-source repositories.',
+  },
+  {
+    id: 'tanish-ai-npc',
+    name: 'Tanish AI Companion',
+    label: 'Tanish AI · Chatbot',
+    panel: 'ai-chat',
+    zone: { x: 660, y: 350, width: 60, height: 60 },
+    doorPoint: { x: 685, y: 410 },
+    roofColor: '#00F0FF',
+    description: 'Ask questions about Tanish, projects, benchmarks, and skills in real time.',
   },
 ];

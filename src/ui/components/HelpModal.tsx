@@ -50,8 +50,8 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <div className="p-3 bg-white border border-[#3A2A1E]/30 rounded-xl flex items-start gap-3">
             <Mouse className="w-5 h-5 text-[#8B5CF6] shrink-0 mt-0.5" />
             <div>
-              <strong className="block text-[#3A2A1E] font-bold">Mouse / Trackpad:</strong>
-              <span>Click anywhere on cobblestone paths or ground to walk there. Click the floating roof badges to travel directly.</span>
+              <strong className="block text-[#3A2A1E] font-bold">Mouse Drag & Pan / Click:</strong>
+              <span>Click and drag anywhere to slide and explore the entire village smoothly! Scroll mouse wheel to zoom in/out. Click on cobblestone paths to walk, or click any roof badge to travel directly.</span>
             </div>
           </div>
 
