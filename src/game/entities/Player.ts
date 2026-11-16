@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { useGameStore } from '../../state/gameStore';
+import { soundEffects } from '../systems/soundEffects';
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   public speed = 190;
@@ -104,9 +105,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.setFlipX(false);
     }
 
-    // Walking animation wobble
+    // Walking animation wobble & footstep sound
     if (vx !== 0 || vy !== 0) {
       this.angle = Math.sin(this.scene.time.now / 100) * 4;
+      soundEffects.playFootstep();
     } else {
       this.angle = 0;
     }

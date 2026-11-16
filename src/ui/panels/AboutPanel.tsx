@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { resumeContent } from '../../data/content';
-import { Terminal, Network, BrainCircuit } from 'lucide-react';
+import { Terminal, Network, BrainCircuit, FastForward } from 'lucide-react';
+import { soundEffects } from '../../game/systems/soundEffects';
 
 const FOCUS_AREAS = [
   {
@@ -24,17 +25,66 @@ const FOCUS_AREAS = [
 ];
 
 export const AboutPanel: React.FC = () => {
+  const fullText = resumeContent.aboutIntro.join('\n\n');
+  const [displayedText, setDisplayedText] = useState('');
+  const [isDone, setIsDone] = useState(false);
+
+  useEffect(() => {
+    // Check prefers-reduced-motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      setDisplayedText(fullText);
+      setIsDone(true);
+      return;
+    }
+
+    let currentLength = 0;
+    const interval = setInterval(() => {
+      currentLength += 2;
+      if (currentLength >= fullText.length) {
+        setDisplayedText(fullText);
+        setIsDone(true);
+        clearInterval(interval);
+      } else {
+        setDisplayedText(fullText.slice(0, currentLength));
+        if (currentLength % 12 === 0) {
+          soundEffects.playDialogueBlip();
+        }
+      }
+    }, 18);
+
+    return () => clearInterval(interval);
+  }, [fullText]);
+
+  const handleSkip = () => {
+    setDisplayedText(fullText);
+    setIsDone(true);
+  };
+
   return (
     <div className="space-y-6">
-      {/* Intro dialogue box */}
-      <div className="p-4 bg-white/70 border-2 border-[#3A2A1E] rounded-xl shadow-[0_3px_0_#3A2A1E]">
-        <div className="text-xs font-mono font-bold text-[#266F73] uppercase mb-1">
-          // About Tanish Kumar
+      {/* Intro dialogue box with Typewriter */}
+      <div className="p-4 bg-white/80 border-2 border-[#3A2A1E] rounded-xl shadow-[0_3px_0_#3A2A1E] relative">
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-xs font-mono font-bold text-[#266F73] uppercase">
+            // Tanish Kumar &middot; Developer Dialogue
+          </div>
+          {!isDone && (
+            <button
+              onClick={handleSkip}
+              className="px-2 py-0.5 text-[11px] font-mono font-bold text-[#3A2A1E] bg-[#FFF1D6] border border-[#3A2A1E]/30 rounded hover:bg-[#F6B73C] transition-colors flex items-center gap-1"
+            >
+              <FastForward className="w-3 h-3" />
+              <span>Skip</span>
+            </button>
+          )}
         </div>
-        <div className="space-y-3 text-sm sm:text-base leading-relaxed text-[#4A382B]">
-          {resumeContent.aboutIntro.map((para, idx) => (
-            <p key={idx}>{para}</p>
-          ))}
+
+        <div className="text-sm sm:text-base leading-relaxed text-[#4A382B] whitespace-pre-line font-medium min-h-[90px]">
+          {displayedText}
+          {!isDone && (
+            <span className="inline-block w-2 h-4 bg-[#266F73] ml-1 animate-pulse" />
+          )}
         </div>
       </div>
 
