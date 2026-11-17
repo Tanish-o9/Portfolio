@@ -12,7 +12,9 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   height: GAME_HEIGHT,
   parent: 'phaser-container',
   backgroundColor: '#94CF7A',
-  pixelArt: true,
+  pixelArt: false,
+  roundPixels: true,
+  antialias: true,
   physics: {
     default: 'arcade',
     arcade: {

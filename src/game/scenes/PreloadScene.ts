@@ -365,6 +365,178 @@ export class PreloadScene extends Phaser.Scene {
     pond.fillCircle(45, 48, 5);
     pond.generateTexture('prop_pond', 124, 94);
     pond.destroy();
+
+    // 6. Town Square Animated Fountain (Centerpiece)
+    const fountain = this.make.graphics({ x: 0, y: 0 });
+    // Base shadow
+    fountain.fillStyle(0x000000, 0.25);
+    fountain.fillEllipse(36, 42, 64, 20);
+    // Outer Stone Basin
+    fountain.fillStyle(0x3a2a1e, 1);
+    fountain.fillEllipse(36, 36, 60, 24);
+    fountain.fillStyle(0xbdae92, 1);
+    fountain.fillEllipse(36, 35, 56, 20);
+    // Water basin pool
+    fountain.fillStyle(0x4a78c2, 1);
+    fountain.fillEllipse(36, 34, 48, 16);
+    fountain.fillStyle(0x7ccbea, 1);
+    fountain.fillEllipse(36, 33, 44, 12);
+    // Center Pedestal & Spout
+    fountain.fillStyle(0x3a2a1e, 1);
+    fountain.fillRect(32, 14, 8, 22);
+    fountain.fillStyle(0xeadfcb, 1);
+    fountain.fillRect(33, 15, 6, 20);
+    // Upper basin
+    fountain.fillStyle(0x3a2a1e, 1);
+    fountain.fillEllipse(36, 16, 24, 10);
+    fountain.fillStyle(0x7ccbea, 1);
+    fountain.fillEllipse(36, 15, 20, 7);
+    fountain.fillStyle(0xffffff, 0.9);
+    fountain.fillCircle(36, 11, 3);
+    fountain.generateTexture('prop_fountain', 72, 54);
+    fountain.destroy();
+
+    // 7. Colorful Flower Beds
+    const flower = this.make.graphics({ x: 0, y: 0 });
+    // Foliage base
+    flower.fillStyle(0x3e9b5e, 1);
+    flower.fillRoundedRect(2, 6, 36, 14, 6);
+    flower.fillStyle(0x47a868, 1);
+    flower.fillCircle(10, 10, 6);
+    flower.fillCircle(20, 8, 7);
+    flower.fillCircle(30, 10, 6);
+    // Blossoms (Red, Gold, Purple)
+    flower.fillStyle(0xd9503f, 1);
+    flower.fillCircle(8, 7, 3);
+    flower.fillStyle(0xf6b73c, 1);
+    flower.fillCircle(15, 5, 3.5);
+    flower.fillStyle(0x7b6bc4, 1);
+    flower.fillCircle(24, 6, 3.5);
+    flower.fillStyle(0xffffff, 1);
+    flower.fillCircle(31, 8, 2.5);
+    flower.generateTexture('prop_flower_patch', 40, 22);
+    flower.destroy();
+
+    // 8. Wooden Picket Fence
+    const fence = this.make.graphics({ x: 0, y: 0 });
+    fence.fillStyle(0x000000, 0.15);
+    fence.fillRoundedRect(2, 20, 46, 6, 3);
+    // Horizontal Rails
+    fence.fillStyle(0x3a2a1e, 1);
+    fence.fillRect(2, 8, 46, 3);
+    fence.fillRect(2, 14, 46, 3);
+    fence.fillStyle(0xfff6e3, 1);
+    fence.fillRect(3, 9, 44, 2);
+    fence.fillRect(3, 15, 44, 2);
+    // Vertical Posts with pointed tops
+    [4, 15, 26, 37].forEach((fx) => {
+      fence.fillStyle(0x3a2a1e, 1);
+      fence.fillRect(fx, 4, 7, 18);
+      fence.fillTriangle(fx, 4, fx + 3.5, 0, fx + 7, 4);
+      fence.fillStyle(0xfff1d6, 1);
+      fence.fillRect(fx + 1, 5, 5, 16);
+      fence.fillTriangle(fx + 1, 5, fx + 3.5, 1.5, fx + 6, 5);
+    });
+    fence.generateTexture('prop_fence', 50, 26);
+    fence.destroy();
+
+    // 9. Cozy Wooden Park Bench
+    const bench = this.make.graphics({ x: 0, y: 0 });
+    bench.fillStyle(0x000000, 0.2);
+    bench.fillEllipse(18, 22, 34, 8);
+    // Iron legs
+    bench.fillStyle(0x3a2a1e, 1);
+    bench.fillRect(4, 10, 4, 12);
+    bench.fillRect(28, 10, 4, 12);
+    bench.fillRect(4, 8, 28, 3);
+    // Wood slats
+    bench.fillStyle(0x8b5a2b, 1);
+    bench.fillRoundedRect(2, 4, 32, 5, 2);
+    bench.fillRoundedRect(3, 10, 30, 4, 1.5);
+    bench.generateTexture('prop_bench', 38, 26);
+    bench.destroy();
+
+    // 10. Cute Retro Bicycle
+    const bike = this.make.graphics({ x: 0, y: 0 });
+    bike.fillStyle(0x000000, 0.2);
+    bike.fillEllipse(15, 22, 28, 6);
+    // Wheels
+    bike.lineStyle(2, 0x3a2a1e, 1);
+    bike.strokeCircle(6, 16, 6);
+    bike.strokeCircle(24, 16, 6);
+    // Frame (Teal)
+    bike.lineStyle(2.5, 0x2e8a8f, 1);
+    bike.beginPath();
+    bike.moveTo(6, 16);
+    bike.lineTo(15, 16);
+    bike.lineTo(13, 8);
+    bike.lineTo(6, 16);
+    bike.strokePath();
+    bike.beginPath();
+    bike.moveTo(15, 16);
+    bike.lineTo(23, 10);
+    bike.lineTo(24, 16);
+    bike.strokePath();
+    // Handlebars & Basket
+    bike.fillStyle(0xf6b73c, 1);
+    bike.fillRect(21, 5, 6, 5);
+    bike.generateTexture('prop_bicycle', 32, 26);
+    bike.destroy();
+
+    // 11. Red Postbox (Postal Pillar)
+    const postbox = this.make.graphics({ x: 0, y: 0 });
+    postbox.fillStyle(0x000000, 0.2);
+    postbox.fillEllipse(9, 27, 16, 6);
+    // Postbox Pillar
+    postbox.fillStyle(0x3a2a1e, 1);
+    postbox.fillRoundedRect(2, 2, 14, 26, 6);
+    postbox.fillStyle(0xd9503f, 1);
+    postbox.fillRoundedRect(3, 3, 12, 24, 5);
+    // Mail slot
+    postbox.fillStyle(0x3a2a1e, 1);
+    postbox.fillRect(5, 8, 8, 2);
+    postbox.fillStyle(0xffffff, 1);
+    postbox.fillRect(5, 14, 8, 7); // Collection label
+    postbox.generateTexture('prop_postbox', 18, 30);
+    postbox.destroy();
+
+    // 12. Directional Crossroads Signpost
+    const signpost = this.make.graphics({ x: 0, y: 0 });
+    signpost.fillStyle(0x000000, 0.2);
+    signpost.fillEllipse(12, 38, 16, 6);
+    // Pole
+    signpost.fillStyle(0x3a2a1e, 1);
+    signpost.fillRect(10, 4, 4, 34);
+    signpost.fillStyle(0x8b5a2b, 1);
+    signpost.fillRect(11, 5, 2, 32);
+    // Arrow 1: Left (Home)
+    signpost.fillStyle(0x3a2a1e, 1);
+    signpost.fillTriangle(2, 12, 6, 8, 6, 16);
+    signpost.fillRect(6, 8, 16, 8);
+    signpost.fillStyle(0xfff6e3, 1);
+    signpost.fillRect(7, 9, 14, 6);
+    // Arrow 2: Right (Projects)
+    signpost.fillStyle(0x3a2a1e, 1);
+    signpost.fillTriangle(24, 22, 20, 18, 20, 26);
+    signpost.fillRect(4, 18, 16, 8);
+    signpost.fillStyle(0xfff6e3, 1);
+    signpost.fillRect(5, 19, 14, 6);
+    signpost.generateTexture('prop_signpost', 26, 42);
+    signpost.destroy();
+
+    // 13. Pond Lily Pad with Lotus
+    const lily = this.make.graphics({ x: 0, y: 0 });
+    lily.fillStyle(0x3e9b5e, 1);
+    lily.fillCircle(9, 9, 8);
+    lily.fillStyle(0x7ccbea, 1);
+    lily.fillTriangle(9, 9, 17, 6, 17, 12); // Cutout notch
+    // Pink Lotus Blossom
+    lily.fillStyle(0xe0674a, 1);
+    lily.fillCircle(7, 7, 3);
+    lily.fillStyle(0xffffff, 0.9);
+    lily.fillCircle(7, 7, 1.5);
+    lily.generateTexture('prop_lilypad', 18, 18);
+    lily.destroy();
   }
 
   private createNpcTextures() {

@@ -187,6 +187,18 @@ export class VillageScene extends Phaser.Scene {
       road.fillRect(r.x, r.y, r.w, r.h);
       road.strokeRect(r.x, r.y, r.w, r.h);
     });
+
+    // Authentic Cobblestone Texture Stones on Road
+    road.fillStyle(0xd9cdb6, 0.75);
+    for (let rx = 12; rx < 1430; rx += 28) {
+      road.fillRoundedRect(rx, 502 + (rx % 3) * 10, 18, 9, 3);
+    }
+    for (let ry = 230; ry < 820; ry += 32) {
+      road.fillRoundedRect(682 + (ry % 2) * 14, ry, 16, 12, 3);
+    }
+    for (let px = 710; px < 1380; px += 34) {
+      road.fillRoundedRect(px, 402 + (px % 2) * 8, 18, 9, 3);
+    }
   }
 
   private setupBuildingsAndZones() {
@@ -296,64 +308,119 @@ export class VillageScene extends Phaser.Scene {
     postNpc.setOrigin(0.5, 0.9);
     postNpc.setDepth(760);
 
-    // 4. Interactive World-Space Badges for all Buildings (Locked to world coordinates)
+    // 4. Rich Environment Props (Town Square Fountain, Benches, Gardens, Fences)
+    // Town Square Fountain Centerpiece
+    const fountain = this.add.image(630, 420, 'prop_fountain');
+    fountain.setOrigin(0.5, 0.85);
+    fountain.setDepth(420);
+    const fountainObs = this.obstacles.create(630, 420, undefined) as Phaser.Physics.Arcade.Sprite;
+    fountainObs.setVisible(false);
+    fountainObs.setSize(52, 24);
+    fountainObs.refreshBody();
+
+    // Park Benches
+    [[565, 465], [745, 465], [1215, 695]].forEach(([bx, by]) => {
+      const b = this.add.image(bx, by, 'prop_bench');
+      b.setOrigin(0.5, 0.85);
+      b.setDepth(by);
+    });
+
+    // Retro Bicycle outside Library
+    const bike = this.add.image(545, 175, 'prop_bicycle');
+    bike.setOrigin(0.5, 0.85);
+    bike.setDepth(175);
+
+    // Red Postbox outside Post Office
+    const pbox = this.add.image(585, 755, 'prop_postbox');
+    pbox.setOrigin(0.5, 0.85);
+    pbox.setDepth(755);
+
+    // Crossroads Signpost
+    const sp = this.add.image(655, 545, 'prop_signpost');
+    sp.setOrigin(0.5, 0.85);
+    sp.setDepth(545);
+
+    // Picket Fences
+    [[90, 225], [138, 225], [186, 225], [90, 745], [138, 745], [540, 195], [740, 195]].forEach(([fx, fy]) => {
+      const f = this.add.image(fx, fy, 'prop_fence');
+      f.setOrigin(0.5, 0.85);
+      f.setDepth(fy);
+    });
+
+    // Flower Beds & Gardens
+    [[240, 225], [470, 360], [740, 220], [960, 755], [1110, 220], [1230, 640], [340, 540], [1010, 485]].forEach(([flx, fly]) => {
+      const fl = this.add.image(flx, fly, 'prop_flower_patch');
+      fl.setOrigin(0.5, 0.85);
+      fl.setDepth(fly);
+    });
+
+    // Pond Lilypads
+    const lily1 = this.add.image(1265, 705, 'prop_lilypad');
+    lily1.setOrigin(0.5, 0.5);
+    lily1.setDepth(710);
+    const lily2 = this.add.image(1315, 735, 'prop_lilypad');
+    lily2.setOrigin(0.5, 0.5);
+    lily2.setDepth(740);
+
+    // 5. Interactive World-Space Badges for all Buildings (Ultra-Crisp & High Contrast)
     this.createPlaceBadges();
   }
 
   private createPlaceBadges() {
     PLACES.forEach((place) => {
       let badgeX = place.zone.x + place.zone.width / 2;
-      let badgeY = place.zone.y - 14;
+      let badgeY = place.zone.y - 18;
 
-      // Stagger project street badges so they have ample breathing room without overlapping
+      // Stagger project street badges so each has wide breathing room without any overlap
       if (place.id === 'project-pramaan' || place.id === 'project-data-engine') {
-        badgeY = place.zone.y - 32;
+        badgeY = place.zone.y - 48;
       } else if (place.id.startsWith('project-')) {
-        badgeY = place.zone.y - 12;
+        badgeY = place.zone.y - 14;
       } else if (place.id === 'tanish-ai-npc') {
         badgeX = 685;
-        badgeY = 340;
+        badgeY = 335;
       } else if (place.id === 'guestbook-stand') {
         badgeX = 610;
-        badgeY = 312;
+        badgeY = 310;
       } else if (place.id === 'cloud-tower') {
-        badgeY = place.zone.y - 4;
+        badgeY = place.zone.y - 8;
       } else if (place.id === 'library') {
-        badgeY = place.zone.y - 18;
+        badgeY = place.zone.y - 24;
       }
 
       const container = this.add.container(badgeX, badgeY);
       container.setDepth(2600);
 
-      // Label text
+      // Large, Bold, Ultra-Crisp Retina Label Text
       const text = this.add.text(0, 0, place.label, {
         fontFamily: 'Fredoka, Nunito, system-ui, sans-serif',
-        fontSize: '11px',
-        color: '#3A2A1E',
-        fontStyle: 'bold',
+        fontSize: '15px',
+        color: '#261A10',
+        fontStyle: '800',
+        resolution: 3,
       });
       text.setOrigin(0, 0.5);
 
       const textW = text.width;
-      const badgeW = Math.max(textW + 36, 85);
-      const badgeH = 26;
+      const badgeW = Math.max(textW + 44, 110);
+      const badgeH = 34;
 
       // Position text with padding for colored indicator dot
-      text.setX(-badgeW / 2 + 22);
+      text.setX(-badgeW / 2 + 25);
 
       // Pill background
       const bg = this.add.graphics();
       const drawBg = (hover = false) => {
         bg.clear();
         // 3D bottom drop shadow
-        bg.fillStyle(0x3a2a1e, 0.9);
-        bg.fillRoundedRect(-badgeW / 2, -badgeH / 2 + 3, badgeW, badgeH, 13);
+        bg.fillStyle(0x261a10, 0.95);
+        bg.fillRoundedRect(-badgeW / 2, -badgeH / 2 + 4, badgeW, badgeH, 17);
         // Pill fill
         bg.fillStyle(hover ? 0xffffff : 0xfff6e3, 1);
-        bg.fillRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 13);
-        // Ink outline
-        bg.lineStyle(2, 0x3a2a1e, 1);
-        bg.strokeRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 13);
+        bg.fillRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 17);
+        // Crisp Ink outline
+        bg.lineStyle(2.5, 0x261a10, 1);
+        bg.strokeRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 17);
       };
       drawBg(false);
 
@@ -361,9 +428,9 @@ export class VillageScene extends Phaser.Scene {
       const dot = this.add.graphics();
       const colorInt = parseInt((place.roofColor || '#F6B73C').replace('#', '0x'), 16);
       dot.fillStyle(colorInt, 1);
-      dot.fillCircle(-badgeW / 2 + 11, 0, 4.5);
-      dot.lineStyle(1.5, 0x3a2a1e, 0.8);
-      dot.strokeCircle(-badgeW / 2 + 11, 0, 4.5);
+      dot.fillCircle(-badgeW / 2 + 13, 0, 5.5);
+      dot.lineStyle(2, 0x261a10, 0.9);
+      dot.strokeCircle(-badgeW / 2 + 13, 0, 5.5);
 
       container.add([bg, dot, text]);
       container.setSize(badgeW, badgeH);
@@ -381,7 +448,7 @@ export class VillageScene extends Phaser.Scene {
         drawBg(true);
         this.tweens.add({
           targets: container,
-          scale: 1.07,
+          scale: 1.08,
           duration: 100,
           ease: 'Sine.easeOut',
         });
@@ -506,6 +573,30 @@ export class VillageScene extends Phaser.Scene {
     const rippleRadius = 20 + Math.sin(this.time.now / 600) * 10;
     this.fxGraphics.lineStyle(1.5, 0xffffff, 0.35);
     this.fxGraphics.strokeEllipse(1290, 720, rippleRadius * 2, rippleRadius * 1.2);
+
+    // Animated Fountain Water Sprays
+    const fTime = this.time.now / 160;
+    for (let i = 0; i < 4; i++) {
+      const angle = (i * Math.PI) / 2 + fTime * 0.6;
+      const fDropX = 630 + Math.cos(angle) * 8;
+      const fDropY = 405 - Math.abs(Math.sin(fTime + i)) * 10;
+      this.fxGraphics.fillStyle(0xffffff, 0.9);
+      this.fxGraphics.fillCircle(fDropX, fDropY, 2);
+    }
+
+    // Animated Fluttering Butterflies over flowerbeds
+    const bTime = this.time.now / 350;
+    const b1x = 240 + Math.sin(bTime) * 18;
+    const b1y = 220 + Math.cos(bTime * 2) * 8;
+    this.fxGraphics.fillStyle(0xf6b73c, 0.95);
+    this.fxGraphics.fillEllipse(b1x - 2.5, b1y, 3, 2);
+    this.fxGraphics.fillEllipse(b1x + 2.5, b1y, 3, 2);
+
+    const b2x = 740 + Math.cos(bTime * 0.8) * 20;
+    const b2y = 215 + Math.sin(bTime * 1.6) * 10;
+    this.fxGraphics.fillStyle(0x00f0ff, 0.95);
+    this.fxGraphics.fillEllipse(b2x - 2.5, b2y, 3, 2);
+    this.fxGraphics.fillEllipse(b2x + 2.5, b2y, 3, 2);
   }
 
   private createInteractionUI() {
