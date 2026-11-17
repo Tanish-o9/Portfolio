@@ -1,0 +1,169 @@
+export type PanelType =
+  | 'about'
+  | 'project'
+  | 'skills'
+  | 'experience'
+  | 'education'
+  | 'contact'
+  | 'resume'
+  | 'guestbook'
+  | null;
+
+export interface PlaceZone {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface Place {
+  id: string;
+  name: string;
+  label: string;
+  panel: PanelType;
+  projectId?: string;
+  zone: PlaceZone;
+  doorPoint: { x: number; y: number };
+  roofColor: string;
+  description: string;
+  externalUrl?: string;
+}
+
+export const PLACES: Place[] = [
+  {
+    id: 'home',
+    name: 'Home',
+    label: 'Home · About Me',
+    panel: 'about',
+    zone: { x: 100, y: 90, width: 140, height: 130 },
+    doorPoint: { x: 208, y: 305 },
+    roofColor: '#2E8A8F',
+    description: 'About Tanish Kumar, headline, background & interests.',
+  },
+  {
+    id: 'library',
+    name: 'Library',
+    label: 'Library · Skills',
+    panel: 'skills',
+    zone: { x: 570, y: 50, width: 180, height: 140 },
+    doorPoint: { x: 697, y: 275 },
+    roofColor: '#E8804F',
+    description: '7 category bookshelves containing verified technical skills.',
+  },
+  {
+    id: 'cloud-tower',
+    name: 'Cloud Tower',
+    label: 'CCC Tower · Experience',
+    panel: 'experience',
+    zone: { x: 1090, y: 20, width: 120, height: 180 },
+    doorPoint: { x: 1165, y: 285 },
+    roofColor: '#4A78C2',
+    description: 'Cloud Computing Cell (CCC) Machine Learning Developer role & contributions.',
+  },
+  {
+    id: 'project-quantora',
+    name: 'QUANTORA Lab',
+    label: 'QUANTORA · GPU Lab',
+    panel: 'project',
+    projectId: 'quantora',
+    zone: { x: 770, y: 280, width: 90, height: 90 },
+    doorPoint: { x: 822, y: 425 },
+    roofColor: '#D9503F',
+    description: 'LLM Performance & Optimization Engineering Platform.',
+  },
+  {
+    id: 'project-pramaan',
+    name: 'Pramaan.ai Booth',
+    label: 'Pramaan.ai · Biometrics',
+    panel: 'project',
+    projectId: 'pramaan-ai',
+    zone: { x: 895, y: 280, width: 90, height: 90 },
+    doorPoint: { x: 947, y: 425 },
+    roofColor: '#7B6BC4',
+    description: 'Face + Voice Biometric Attendance & Governance.',
+  },
+  {
+    id: 'project-whytrace',
+    name: 'WhyTrace.ai HQ',
+    label: 'WhyTrace.ai · Detective Office',
+    panel: 'project',
+    projectId: 'whytrace-ai',
+    zone: { x: 1020, y: 280, width: 90, height: 90 },
+    doorPoint: { x: 1072, y: 425 },
+    roofColor: '#D9A441',
+    description: 'Interpretability-First Evaluation Harness for Tool-Calling AI Agents.',
+  },
+  {
+    id: 'project-data-engine',
+    name: 'LLM Data Engine',
+    label: 'LLM Data Engine · Workshop',
+    panel: 'project',
+    projectId: 'llm-data-engine',
+    zone: { x: 1145, y: 280, width: 90, height: 90 },
+    doorPoint: { x: 1197, y: 425 },
+    roofColor: '#E8A640',
+    description: 'Data quality and fine-tuning pipeline for raw LLM datasets.',
+  },
+  {
+    id: 'project-mini-vlm',
+    name: 'Mini VLM Observatory',
+    label: 'Mini VLM · Observatory',
+    panel: 'project',
+    projectId: 'mini-vlm',
+    zone: { x: 1270, y: 280, width: 90, height: 90 },
+    doorPoint: { x: 1322, y: 425 },
+    roofColor: '#4A78C2',
+    description: 'Lightweight multimodal vision-language model.',
+  },
+  {
+    id: 'guestbook-stand',
+    name: 'Town Square Guestbook',
+    label: 'Guestbook Stand',
+    panel: 'guestbook',
+    zone: { x: 580, y: 330, width: 60, height: 60 },
+    doorPoint: { x: 625, y: 400 },
+    roofColor: '#E0674A',
+    description: 'Public visitor guestbook (Supabase).',
+  },
+  {
+    id: 'notice-board',
+    name: 'Notice Board',
+    label: 'Notice Board · Resume',
+    panel: 'resume',
+    zone: { x: 400, y: 380, width: 70, height: 60 },
+    doorPoint: { x: 450, y: 455 },
+    roofColor: '#F6B73C',
+    description: 'ATS Resume view & PDF download.',
+  },
+  {
+    id: 'college',
+    name: 'AKGEC College',
+    label: 'College · Education',
+    panel: 'education',
+    zone: { x: 100, y: 610, width: 160, height: 130 },
+    doorPoint: { x: 200, y: 795 },
+    roofColor: '#4A78C2',
+    description: 'B.Tech CSE at AKGEC & verified LeetCode achievements.',
+  },
+  {
+    id: 'post-office',
+    name: 'Post Office',
+    label: 'Post Office · Contact',
+    panel: 'contact',
+    zone: { x: 605, y: 655, width: 140, height: 110 },
+    doorPoint: { x: 697, y: 815 },
+    roofColor: '#D9503F',
+    description: 'Contact coordinates & direct messaging form.',
+  },
+  {
+    id: 'workshop-sign',
+    name: 'GitHub Workshop',
+    label: 'GitHub Workshop · Code',
+    panel: null,
+    externalUrl: 'https://github.com/Tanish-o9',
+    zone: { x: 960, y: 640, width: 130, height: 110 },
+    doorPoint: { x: 1060, y: 790 },
+    roofColor: '#3A2A1E',
+    description: 'Open source profile and repositories on GitHub.',
+  },
+];

@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #080B14;
+  --color-bg-alt: #0A0F1C;
+  --color-card: #111B2D;
+  --color-card-border: #1E2B45;
+  --color-chip-bg: #0C1424;
+  --color-chip-border: #22314F;
+  --color-accent: #4F8CFF;
+  --color-accent-2: #8B5CF6;
+  --color-text: #F8FAFC;
+  --color-text-body: #B6C2D6;
+  --color-text-muted: #94A3B8;
+  --color-border-separator: #1B2740;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080B14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E2B45;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2A3A5C;
+}
+
+/* Technical 48px grid pattern for Hero */
+.bg-tech-grid {
+  background-size: 48px 48px;
+  background-image: 
+    linear-gradient(to right, rgba(79, 140, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(79, 140, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Subtle dot grid */
+.bg-dot-grid {
+  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
