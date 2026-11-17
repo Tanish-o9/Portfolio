@@ -374,7 +374,7 @@ export const resumeContent = {
   achievements: [
     {
       title: "LeetCode Problem Solving",
-      description: "Solved 100+ Data Structures and Algorithms problems using C++.",
+      description: "Solved 100+ Data Structures and Algorithms problems.",
     },
     {
       title: "Cloud Computing Cell (CCC)",

@@ -49,7 +49,7 @@ function getAiResponse(query: string): string {
   }
 
   if (q.includes('education') || q.includes('college') || q.includes('akgec') || q.includes('cgpa') || q.includes('leetcode')) {
-    return `Tanish is pursuing B.Tech in Computer Science and Engineering (2025–2029) at Ajay Kumar Garg Engineering College (AKGEC), Ghaziabad with an 8.50 CGPA. He has also solved 100+ Data Structures & Algorithms problems on LeetCode using C++.`;
+    return `Tanish is pursuing B.Tech in Computer Science and Engineering (2025–2029) at Ajay Kumar Garg Engineering College (AKGEC), Ghaziabad with an 8.50 CGPA. He has also solved 100+ Data Structures & Algorithms problems on LeetCode.`;
   }
 
   return `Hello! I'm Tanish's AI Village Companion. Tanish is an AI Engineer specializing in Agentic AI, LLM Inference Optimization, and RAG. You can ask me about QUANTORA, Pramaan.ai, WhyTrace.ai, his ML role at CCC, or technical skills!`;
