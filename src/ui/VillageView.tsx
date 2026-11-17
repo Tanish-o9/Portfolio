@@ -5,6 +5,7 @@ import { useGameStore } from '../state/gameStore';
 import { Hud } from './components/Hud';
 import { Minimap } from './components/Minimap';
 import { Joystick } from './components/Joystick';
+import { QuestTracker } from './components/QuestTracker';
 import { Modal } from './components/Modal';
 import { IntroModal } from './components/IntroModal';
 import { Sparkles } from 'lucide-react';
@@ -78,18 +79,22 @@ export const VillageView: React.FC = () => {
         className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
       />
 
-      {/* Day / Evening Tint Overlay */}
-      {season === 'evening' && (
-        <div className="absolute inset-0 pointer-events-none bg-[#7B6BC4]/20 mix-blend-multiply z-10" />
+      {/* Day / Sunset / Cyber Night Atmosphere Tint Overlays */}
+      {season === 'sunset' && (
+        <div className="absolute inset-0 pointer-events-none bg-[#E8804F]/20 mix-blend-multiply z-10" />
+      )}
+      {season === 'night' && (
+        <div className="absolute inset-0 pointer-events-none bg-[#091124]/55 mix-blend-multiply z-10" />
       )}
 
       {/* HUD Overlays */}
       <Hud />
+      <QuestTracker />
       <Minimap />
       <Joystick />
 
-      {/* Floating Quick Action: Tanish AI Assistant */}
-      <div className="fixed bottom-6 left-6 z-30 pointer-events-auto">
+      {/* Floating Quick Action: Tanish AI Assistant - Lower Right Side */}
+      <div className="fixed bottom-6 right-6 md:bottom-[148px] md:right-4 z-30 pointer-events-auto">
         <button
           onClick={() => openPanel('ai-chat')}
           className="flex items-center gap-2 px-3.5 py-2.5 bg-[#FFF6E3] hover:bg-[#FFF] border-2 border-[#3A2A1E] rounded-2xl shadow-[0_4px_0_#3A2A1E] text-xs font-bold text-[#3A2A1E] transition-transform active:translate-y-1 hover:scale-105"

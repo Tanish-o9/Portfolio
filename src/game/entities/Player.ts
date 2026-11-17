@@ -5,6 +5,7 @@ import { soundEffects } from '../systems/soundEffects';
 export class Player extends Phaser.Physics.Arcade.Sprite {
   public speed = 190;
   private shadow: Phaser.GameObjects.Image;
+  private petSprite: Phaser.GameObjects.Image;
   private targetPoint: Phaser.Math.Vector2 | null = null;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasdKeys!: {
@@ -20,6 +21,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     // Add shadow image under player
     this.shadow = scene.add.image(x, y + 20, 'shadow_blob');
     this.shadow.setOrigin(0.5, 0.5);
+
+    // Companion pet sprite (Drone or Cat)
+    this.petSprite = scene.add.image(x - 22, y + 4, 'pet_drone');
+    this.petSprite.setOrigin(0.5, 0.5);
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -116,6 +121,35 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     // Keep shadow glued to feet
     this.shadow.setPosition(this.x, this.y + 20);
     this.shadow.setDepth(this.y - 1);
+
+    // Companion pet logic & smooth trailing
+    const { pet, hoodieColor } = useGameStore.getState();
+    if (pet === 'none') {
+      this.petSprite.setVisible(false);
+    } else {
+      this.petSprite.setVisible(true);
+      const textureKey = pet === 'cat' ? 'pet_cat' : 'pet_drone';
+      if (this.petSprite.texture.key !== textureKey) {
+        this.petSprite.setTexture(textureKey);
+      }
+
+      const targetPetX = this.flipX ? this.x + 22 : this.x - 22;
+      const bob = pet === 'drone' ? Math.sin(this.scene.time.now / 180) * 4 : 0;
+      const targetPetY = this.y + (pet === 'drone' ? -8 : 12) + bob;
+
+      this.petSprite.x += (targetPetX - this.petSprite.x) * 0.14;
+      this.petSprite.y += (targetPetY - this.petSprite.y) * 0.14;
+      this.petSprite.setDepth(this.y + 2);
+      this.petSprite.setFlipX(this.flipX);
+    }
+
+    // Custom hoodie color tint
+    if (hoodieColor && hoodieColor !== '#4F8CFF') {
+      const tintInt = parseInt(hoodieColor.replace('#', '0x'), 16);
+      this.setTint(tintInt);
+    } else {
+      this.clearTint();
+    }
 
     // Y-sorting depth
     this.setDepth(this.y);

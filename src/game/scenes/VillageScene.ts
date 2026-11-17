@@ -455,8 +455,21 @@ export class VillageScene extends Phaser.Scene {
   }
 
   private updateAmbientParticles() {
-    const isEvening = useGameStore.getState().season === 'evening';
+    const season = useGameStore.getState().season;
+    const isNight = season === 'night';
+    const isSunset = season === 'sunset';
     this.fxGraphics.clear();
+
+    // Streetlamp warm light halo in sunset and night
+    if (isNight || isSunset) {
+      const haloAlpha = isNight ? 0.28 : 0.15;
+      [[651, 448], [751, 448], [651, 600], [751, 600]].forEach(([lx, ly]) => {
+        this.fxGraphics.fillStyle(0xffe072, haloAlpha);
+        this.fxGraphics.fillCircle(lx, ly, 40);
+        this.fxGraphics.fillStyle(0xfff3a8, haloAlpha * 1.6);
+        this.fxGraphics.fillCircle(lx, ly, 18);
+      });
+    }
 
     for (const p of this.particles) {
       p.x += p.vx;
@@ -480,7 +493,7 @@ export class VillageScene extends Phaser.Scene {
         }
         this.fxGraphics.fillStyle(0xe8a640, 0.7);
         this.fxGraphics.fillEllipse(p.x, p.y, p.size * 1.5, p.size);
-      } else if (p.type === 'firefly' && isEvening) {
+      } else if (p.type === 'firefly' && (isNight || isSunset)) {
         p.vx += (Math.random() - 0.5) * 0.05;
         p.vy += (Math.random() - 0.5) * 0.05;
         const pulse = 0.5 + Math.sin(this.time.now / 300) * 0.4;

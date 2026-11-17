@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, User, Sparkles } from 'lucide-react';
 import { soundEffects } from '../../game/systems/soundEffects';
+import { useGameStore } from '../../state/gameStore';
 
 interface Message {
   role: 'bot' | 'user';
@@ -72,6 +73,7 @@ export const AiChatPanel: React.FC = () => {
     if (!text.trim()) return;
 
     soundEffects.playClick();
+    useGameStore.getState().completeQuest('tanish_ai');
     const userMsg: Message = { role: 'user', text };
     setMessages((prev) => [...prev, userMsg]);
     setInputVal('');

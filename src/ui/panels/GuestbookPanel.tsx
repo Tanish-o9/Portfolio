@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MessageSquare, Send, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { soundEffects } from '../../game/systems/soundEffects';
+import { useGameStore } from '../../state/gameStore';
 
 interface GuestbookEntry {
   id: string;
@@ -25,6 +26,7 @@ export const GuestbookPanel: React.FC = () => {
 
   // Fetch approved entries
   useEffect(() => {
+    useGameStore.getState().completeQuest('guestbook_sign');
     const client = supabase;
     if (!isSupabaseConfigured || !client) return;
 

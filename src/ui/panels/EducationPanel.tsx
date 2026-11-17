@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { resumeContent } from '../../data/content';
 import { GraduationCap, Award, CheckCircle } from 'lucide-react';
+import { useGameStore } from '../../state/gameStore';
 
 export const EducationPanel: React.FC = () => {
   const edu = resumeContent.education;
   const achievements = resumeContent.achievements;
+
+  useEffect(() => {
+    useGameStore.getState().completeQuest('college_leetcode');
+  }, []);
 
   return (
     <div className="space-y-4">

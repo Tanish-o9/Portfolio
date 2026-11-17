@@ -1,22 +1,31 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Sun, Moon, HelpCircle } from 'lucide-react';
+import { Sun, Sunset, Moon, HelpCircle } from 'lucide-react';
 import { useGameStore } from '../../state/gameStore';
 import { soundEffects } from '../../game/systems/soundEffects';
 import { HelpModal } from './HelpModal';
+import { Jukebox } from './Jukebox';
+import { AvatarCustomizerModal } from './AvatarCustomizerModal';
 
 export const Hud: React.FC = () => {
-  const { visitedPlaces, muted, toggleMute, season, toggleSeason } = useGameStore();
+  const { visitedPlaces, season, toggleSeason, hoodieColor } = useGameStore();
   const [showHelp, setShowHelp] = useState(false);
+  const [showAvatarCustomizer, setShowAvatarCustomizer] = useState(false);
   const totalPlaces = 8;
-
-  const handleSoundToggle = () => {
-    toggleMute();
-    soundEffects.playClick();
-  };
 
   const handleSeasonToggle = () => {
     toggleSeason();
     soundEffects.playClick();
+  };
+
+  const getSeasonIcon = () => {
+    switch (season) {
+      case 'sunset':
+        return <Sunset className="w-4 h-4 text-[#E0674A]" />;
+      case 'night':
+        return <Moon className="w-4 h-4 text-[#7B6BC4]" />;
+      default:
+        return <Sun className="w-4 h-4 text-[#F6B73C]" />;
+    }
   };
 
   return (
@@ -36,23 +45,34 @@ export const Hud: React.FC = () => {
 
         {/* Top Right Controls */}
         <div className="flex items-center gap-2 pointer-events-auto">
-          {/* Sound toggle */}
+          {/* Lo-Fi Procedural Jukebox Radio */}
+          <Jukebox />
+
+          {/* Avatar Customizer Button */}
           <button
-            onClick={handleSoundToggle}
-            aria-label={muted ? 'Turn sound on' : 'Turn sound off'}
-            className="h-10 px-3 bg-[#FFF6E3] border-2 border-[#3A2A1E] rounded-xl shadow-[0_3px_0_#3A2A1E] text-xs font-bold text-[#3A2A1E] flex items-center gap-1.5 hover:bg-white active:translate-y-0.5 active:shadow-none transition-all"
+            onClick={() => {
+              setShowAvatarCustomizer(true);
+              soundEffects.playClick();
+            }}
+            aria-label="Customize Avatar"
+            className="h-10 px-2.5 bg-[#FFF6E3] border-2 border-[#3A2A1E] rounded-xl shadow-[0_3px_0_#3A2A1E] text-xs font-bold text-[#3A2A1E] flex items-center gap-1.5 hover:bg-white active:translate-y-0.5 active:shadow-none transition-all"
+            title="Customize Explorer & Pet"
           >
-            {muted ? <VolumeX className="w-4 h-4 text-[#D9503F]" /> : <Volume2 className="w-4 h-4 text-[#266F73]" />}
-            <span className="hidden sm:inline">{muted ? 'Sound: off' : 'Sound: on'}</span>
+            <div
+              className="w-3.5 h-3.5 rounded-full border border-[#3A2A1E]"
+              style={{ backgroundColor: hoodieColor }}
+            />
+            <span className="hidden sm:inline">Avatar</span>
           </button>
 
-          {/* Day / Evening toggle */}
+          {/* Dynamic 3-Atmosphere Lighting Toggle (Day / Sunset / Cyber Night) */}
           <button
             onClick={handleSeasonToggle}
-            aria-label="Toggle day and evening theme"
+            aria-label="Toggle lighting mode"
             className="h-10 px-3 bg-[#FFF6E3] border-2 border-[#3A2A1E] rounded-xl shadow-[0_3px_0_#3A2A1E] text-xs font-bold text-[#3A2A1E] flex items-center gap-1.5 hover:bg-white active:translate-y-0.5 active:shadow-none transition-all"
+            title="Switch Day / Sunset / Cyber Night"
           >
-            {season === 'day' ? <Sun className="w-4 h-4 text-[#F6B73C]" /> : <Moon className="w-4 h-4 text-[#7B6BC4]" />}
+            {getSeasonIcon()}
             <span className="hidden sm:inline capitalize">{season}</span>
           </button>
 
@@ -69,6 +89,12 @@ export const Hud: React.FC = () => {
 
       {/* Help Modal */}
       <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+
+      {/* Avatar & Pet Customizer Modal */}
+      <AvatarCustomizerModal
+        isOpen={showAvatarCustomizer}
+        onClose={() => setShowAvatarCustomizer(false)}
+      />
     </>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Terminal as TerminalIcon, ExternalLink, Github } from 'lucide-react';
 import { resumeContent } from '../../data/content';
+import { useGameStore } from '../../state/gameStore';
 
 export const TerminalPanel: React.FC = () => {
   const [history, setHistory] = useState<Array<{ cmd: string; output: React.ReactNode }>>([
@@ -31,6 +32,7 @@ export const TerminalPanel: React.FC = () => {
     const raw = inputVal.trim();
     if (!raw) return;
 
+    useGameStore.getState().completeQuest('workshop_terminal');
     const cmd = raw.toLowerCase();
     let output: React.ReactNode = null;
 

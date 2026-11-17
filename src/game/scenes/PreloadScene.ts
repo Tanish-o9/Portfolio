@@ -7,6 +7,7 @@ export class PreloadScene extends Phaser.Scene {
 
   preload() {
     this.createPlayerTextures();
+    this.createPetTextures();
     this.createBuildingTextures();
     this.createEnvironmentTextures();
     this.createNpcTextures();
@@ -83,6 +84,57 @@ export class PreloadScene extends Phaser.Scene {
     pSide.fillRect(10, 36, 7, 8);
     pSide.generateTexture('player_side', 28, 46);
     pSide.destroy();
+  }
+
+  private createPetTextures() {
+    // 1. AI Companion Drone (Floating Cyan Orb)
+    const drone = this.make.graphics({ x: 0, y: 0 });
+    // Soft shadow
+    drone.fillStyle(0x000000, 0.2);
+    drone.fillEllipse(10, 19, 14, 6);
+    // Body & dark outline
+    drone.fillStyle(0x3a2a1e, 1);
+    drone.fillCircle(10, 9, 8);
+    // Metallic Teal/Cyan shell
+    drone.fillStyle(0x266f73, 1);
+    drone.fillCircle(10, 9, 6.5);
+    // Glowing cyan visor eye
+    drone.fillStyle(0x00f0ff, 1);
+    drone.fillRoundedRect(6, 7, 8, 4, 2);
+    // Top antenna
+    drone.fillStyle(0xf6b73c, 1);
+    drone.fillCircle(10, 2, 1.5);
+    drone.generateTexture('pet_drone', 20, 22);
+    drone.destroy();
+
+    // 2. Cozy Chibi Cat
+    const cat = this.make.graphics({ x: 0, y: 0 });
+    cat.fillStyle(0x000000, 0.2);
+    cat.fillEllipse(10, 18, 16, 6);
+    // Body
+    cat.fillStyle(0x3a2a1e, 1);
+    cat.fillRoundedRect(3, 7, 14, 10, 4);
+    cat.fillStyle(0xf6b73c, 1);
+    cat.fillRoundedRect(4, 8, 12, 8, 3);
+    // Head & Ears
+    cat.fillStyle(0x3a2a1e, 1);
+    cat.fillCircle(6, 6, 5);
+    cat.fillTriangle(3, 4, 5, 0, 7, 4); // Left ear
+    cat.fillTriangle(7, 4, 9, 0, 11, 4); // Right ear
+    cat.fillStyle(0xfff6e3, 1);
+    cat.fillCircle(6, 6, 3.5);
+    // Eyes
+    cat.fillStyle(0x3a2a1e, 1);
+    cat.fillRect(5, 5, 1, 2);
+    cat.fillRect(8, 5, 1, 2);
+    // Tail
+    cat.lineStyle(2, 0x3a2a1e, 1);
+    cat.beginPath();
+    cat.moveTo(15, 12);
+    cat.lineTo(19, 8);
+    cat.strokePath();
+    cat.generateTexture('pet_cat', 22, 20);
+    cat.destroy();
   }
 
   private createBuildingTextures() {

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { resumeContent } from '../../data/content';
-import { Github, ExternalLink, Cpu, Gauge } from 'lucide-react';
+import { Github, ExternalLink, Cpu, Gauge, ScanFace, Activity, ShieldCheck, Play, CheckCircle } from 'lucide-react';
 import { soundEffects } from '../../game/systems/soundEffects';
+import { useGameStore } from '../../state/gameStore';
 
 interface ProjectPanelProps {
   initialProjectId?: string | null;
@@ -33,6 +34,13 @@ export const ProjectPanel: React.FC<ProjectPanelProps> = ({ initialProjectId }) 
   const [selectedPrecision, setSelectedPrecision] = useState<PrecisionMode>('INT4 NF4');
   const [kvCacheEnabled, setKvCacheEnabled] = useState(true);
 
+  // Pramaan.ai Biometric Scanner State
+  const [isScanningBiometrics, setIsScanningBiometrics] = useState(false);
+  const [biometricsVerified, setBiometricsVerified] = useState(true);
+
+  // WhyTrace.ai Agent Trace State
+  const [activeTraceStep, setActiveTraceStep] = useState(3);
+
   const currentProject = allProjects.find((p) => p.id === selectedId) || allProjects[0];
   const isFeatured = 'overview' in currentProject;
   const featured = isFeatured ? (currentProject as (typeof resumeContent.featuredProjects)[0]) : null;
@@ -47,6 +55,24 @@ export const ProjectPanel: React.FC<ProjectPanelProps> = ({ initialProjectId }) 
   const handlePrecisionChange = (mode: PrecisionMode) => {
     setSelectedPrecision(mode);
     soundEffects.playClick();
+    if (mode === 'INT4 NF4') {
+      useGameStore.getState().completeQuest('quantora_sim');
+    }
+  };
+
+  const handleRunBiometricScan = () => {
+    setIsScanningBiometrics(true);
+    soundEffects.playClick();
+    setTimeout(() => {
+      setIsScanningBiometrics(false);
+      setBiometricsVerified(true);
+      soundEffects.playEnter();
+    }, 1000);
+  };
+
+  const handleStepTrace = () => {
+    soundEffects.playClick();
+    setActiveTraceStep((prev) => (prev + 1) % 5);
   };
 
   return (
@@ -157,6 +183,130 @@ export const ProjectPanel: React.FC<ProjectPanelProps> = ({ initialProjectId }) 
                 <span>Speedup: {kvCacheEnabled ? currentBench.speedup : '1.00x'}</span>
                 <span>FP32: 1,903 MB</span>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* PRAMAAN.AI LIVE MULTI-MODAL BIOMETRIC SIMULATOR */}
+        {currentProject.id === 'pramaan-ai' && (
+          <div className="p-4 bg-white/70 border-2 border-[#3A2A1E] rounded-xl shadow-sm space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ScanFace className="w-4 h-4 text-[#7B6BC4]" />
+                <span className="text-xs font-mono font-extrabold uppercase text-[#3A2A1E]">
+                  Multi-Modal Biometric Scanner
+                </span>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded font-bold">
+                FAR &lt; 0.4% Target
+              </span>
+            </div>
+
+            {/* Simulated Scanner Visualizer */}
+            <div className="grid grid-cols-2 gap-3 p-3 bg-[#111B2D] border-2 border-[#3A2A1E] rounded-xl text-white">
+              {/* Face Landmark Mesh */}
+              <div className="flex flex-col items-center justify-center p-3 bg-black/40 rounded-lg relative overflow-hidden">
+                <div className={`w-14 h-14 rounded-full border-2 ${isScanningBiometrics ? 'border-cyan-400 animate-spin' : 'border-emerald-400'} flex items-center justify-center relative`}>
+                  <ScanFace className="w-8 h-8 text-cyan-300" />
+                  <span className="absolute top-1 left-2 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  <span className="absolute bottom-1 right-2 w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                </div>
+                <span className="text-[10px] font-mono mt-2 text-cyan-200">
+                  {isScanningBiometrics ? 'Tracking Mesh...' : 'Face Landmarks: 468 pts'}
+                </span>
+              </div>
+
+              {/* Voice Frequency Waveform */}
+              <div className="flex flex-col items-center justify-center p-3 bg-black/40 rounded-lg">
+                <div className="flex items-end gap-1 h-12 w-full justify-center">
+                  {[18, 36, 48, 24, 40, 16, 32, 44, 20].map((h, i) => (
+                    <div
+                      key={i}
+                      className={`w-1.5 rounded-full transition-all duration-150 ${isScanningBiometrics ? 'bg-cyan-400 animate-pulse' : 'bg-[#7B6BC4]'}`}
+                      style={{ height: isScanningBiometrics ? `${Math.random() * 36 + 10}px` : `${h}px` }}
+                    />
+                  ))}
+                </div>
+                <span className="text-[10px] font-mono mt-2 text-purple-200">
+                  Voiceprint: MFCC Filtered
+                </span>
+              </div>
+            </div>
+
+            {/* Action Button */}
+            <div className="flex items-center justify-between pt-1">
+              <button
+                onClick={handleRunBiometricScan}
+                disabled={isScanningBiometrics}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#7B6BC4] text-white font-bold rounded-lg text-xs border border-[#3A2A1E] shadow-[0_2px_0_#3A2A1E] hover:bg-[#6858af] active:translate-y-0.5"
+              >
+                <Activity className="w-3.5 h-3.5" />
+                <span>{isScanningBiometrics ? 'Verifying...' : 'Test Biometric Auth'}</span>
+              </button>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>Liveness: {biometricsVerified ? 'Verified PASS' : 'Scanning'}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* WHYTRACE.AI LIVE AGENT REASONING TRACE VISUALIZER */}
+        {currentProject.id === 'whytrace-ai' && (
+          <div className="p-4 bg-white/70 border-2 border-[#3A2A1E] rounded-xl shadow-sm space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-[#D9A441]" />
+                <span className="text-xs font-mono font-extrabold uppercase text-[#3A2A1E]">
+                  Agent Interpretability Decision Trace
+                </span>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded font-bold">
+                ReAct Decision Graph
+              </span>
+            </div>
+
+            {/* Step Trace Progression */}
+            <div className="space-y-1.5 font-mono text-xs">
+              {[
+                { step: 0, tag: 'PROMPT', text: 'Analyze multi-agent LLM latency bottlenecks on GPU.' },
+                { step: 1, tag: 'THOUGHT', text: 'Detecting tool dependencies: CUDA profiler required.' },
+                { step: 2, tag: 'ACTION', text: 'Call tool: cuda_kernel_profiler(target="qwen2.5")' },
+                { step: 3, tag: 'GUARDRAIL', text: 'Hallucination Check: Verified citations (Score 0.01)' },
+                { step: 4, tag: 'RESPONSE', text: 'Grounded output synthesized with zero hallucination.' },
+              ].map((item) => (
+                <div
+                  key={item.step}
+                  className={`p-2 rounded-lg border transition-all flex items-start gap-2 ${
+                    activeTraceStep >= item.step
+                      ? 'bg-[#111B2D] text-white border-[#3A2A1E]'
+                      : 'bg-white/40 text-[#4A382B]/40 border-dashed border-[#3A2A1E]/20'
+                  }`}
+                >
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                    item.tag === 'GUARDRAIL' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-cyan-500/20 text-cyan-300'
+                  }`}>
+                    {item.tag}
+                  </span>
+                  <span className="text-[11px] leading-tight flex-1">{item.text}</span>
+                  {activeTraceStep >= item.step && (
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <button
+                onClick={handleStepTrace}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#D9A441] text-[#3A2A1E] font-bold rounded-lg text-xs border border-[#3A2A1E] shadow-[0_2px_0_#3A2A1E] hover:bg-[#e6b34e] active:translate-y-0.5"
+              >
+                <Play className="w-3.5 h-3.5" />
+                <span>Step Next Trace ({activeTraceStep + 1}/5)</span>
+              </button>
+              <span className="text-[11px] text-[#4A382B] font-mono">
+                Real-Time Tool-Calling Evaluation
+              </span>
             </div>
           </div>
         )}
