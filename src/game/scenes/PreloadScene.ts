@@ -571,25 +571,45 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   private createNpcTextures() {
-    // 1. Tanish AI NPC (Town Square Companion with glowing cyber visor)
+    // 1. Tanish AI NPC (Town Square Companion with glowing cyber visor, antenna & headset)
     const aiNpc = this.make.graphics({ x: 0, y: 0 });
-    aiNpc.fillStyle(0x3a2a1e, 1);
-    aiNpc.fillRoundedRect(4, 2, 20, 20, 10);
-    aiNpc.fillRoundedRect(2, 18, 24, 26, 6);
+    // Soft shadow
+    aiNpc.fillStyle(0x000000, 0.25);
+    aiNpc.fillEllipse(14, 44, 20, 6);
+    // Base silhouette
+    aiNpc.fillStyle(0x261a10, 1);
+    aiNpc.fillRoundedRect(4, 4, 20, 20, 10);
+    aiNpc.fillRoundedRect(2, 20, 24, 24, 6);
+    // Skin / Face
     aiNpc.fillStyle(0xffdbb5, 1);
-    aiNpc.fillRoundedRect(6, 8, 16, 12, 4);
-    // Glowing cyan visor
+    aiNpc.fillRoundedRect(6, 9, 16, 12, 4);
+    // Glowing Cyan Cyber Visor with animated expression aesthetic
     aiNpc.fillStyle(0x00f0ff, 1);
-    aiNpc.fillRoundedRect(8, 11, 12, 4, 2);
-    // Dark engineer hoodie
-    aiNpc.fillStyle(0x111b2d, 1);
-    aiNpc.fillRoundedRect(4, 20, 20, 16, 4);
-    aiNpc.fillStyle(0x4f8cff, 1);
-    aiNpc.fillRect(13, 20, 2, 16); // Accent zipper
+    aiNpc.fillRoundedRect(7, 11, 14, 5, 2);
+    aiNpc.fillStyle(0xffffff, 0.9);
+    aiNpc.fillRect(9, 12, 3, 2);
+    aiNpc.fillRect(16, 12, 3, 2);
+    // Cyber Headset
+    aiNpc.fillStyle(0x1e293b, 1);
+    aiNpc.fillRoundedRect(3, 10, 3, 7, 1.5);
+    aiNpc.fillRoundedRect(22, 10, 3, 7, 1.5);
+    // Top Antenna with glowing golden orb
     aiNpc.fillStyle(0x3a2a1e, 1);
-    aiNpc.fillRect(6, 36, 6, 8);
-    aiNpc.fillRect(16, 36, 6, 8);
-    aiNpc.generateTexture('npc_tanish_ai', 28, 46);
+    aiNpc.fillRect(13, 0, 2, 5);
+    aiNpc.fillStyle(0xf6b73c, 1);
+    aiNpc.fillCircle(14, 1.5, 2.5);
+    aiNpc.fillStyle(0x00f0ff, 1);
+    aiNpc.fillCircle(14, 1.5, 1.2);
+    // Deep Midnight Engineer Hoodie
+    aiNpc.fillStyle(0x0f172a, 1);
+    aiNpc.fillRoundedRect(4, 21, 20, 16, 4);
+    // Cyan cyber circuitry line on hoodie
+    aiNpc.fillStyle(0x00f0ff, 1);
+    aiNpc.fillRect(13, 21, 2, 16);
+    aiNpc.fillStyle(0x3a2a1e, 1);
+    aiNpc.fillRect(6, 37, 6, 8);
+    aiNpc.fillRect(16, 37, 6, 8);
+    aiNpc.generateTexture('npc_tanish_ai', 28, 48);
     aiNpc.destroy();
 
     // 2. Librarian NPC

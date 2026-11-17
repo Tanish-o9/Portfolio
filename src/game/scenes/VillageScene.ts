@@ -83,21 +83,49 @@ export class VillageScene extends Phaser.Scene {
     // Set world and physics bounds
     this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
 
-    // 1. Ground: Lush grass base extending comfortably beyond bounds
-    this.add.rectangle(worldWidth / 2, worldHeight / 2, worldWidth + 800, worldHeight + 600, 0x94cf7a);
+    // 1. Ground: Lush warm meadow grass base extending comfortably beyond bounds
+    this.add.rectangle(worldWidth / 2, worldHeight / 2, worldWidth + 800, worldHeight + 600, 0x8ac46e);
 
-    // Subtle grass patch variation
+    // Subtle meadow rolling hills variation
     const patches = this.add.graphics();
-    patches.fillStyle(0x88c56f, 0.6);
+    patches.fillStyle(0x7ebc61, 0.45);
     const patchPositions = [
-      [180, 180, 80], [450, 120, 110], [900, 150, 90], [350, 680, 120],
-      [840, 720, 100], [1200, 560, 90], [520, 480, 70], [80, 480, 60]
+      [180, 180, 110], [450, 120, 130], [900, 150, 110], [350, 680, 140],
+      [840, 720, 120], [1200, 560, 110], [520, 480, 95], [80, 480, 85],
+      [1350, 320, 100], [280, 340, 90], [1050, 160, 110], [640, 820, 120]
     ];
     patchPositions.forEach(([px, py, pr]) => {
       patches.fillCircle(px, py, pr);
     });
 
-    // 2. Road Network (Cobblestone #EADFCB with border #BDAE92)
+    // Sunlit warm grass patches
+    patches.fillStyle(0x9bd47c, 0.35);
+    [
+      [220, 140, 65], [600, 110, 75], [960, 180, 60], [400, 710, 80],
+      [800, 690, 70], [1160, 520, 65], [710, 360, 55], [130, 450, 50]
+    ].forEach(([sx, sy, sr]) => {
+      patches.fillCircle(sx, sy, sr);
+    });
+
+    // Delicate scattered wildflower & clover meadow specks
+    const flowers = this.add.graphics();
+    flowers.fillStyle(0xfffdf7, 0.85); // White daisies
+    const daisyCoords = [
+      [120, 260], [290, 160], [380, 90], [490, 220], [840, 110], [1010, 90],
+      [70, 680], [260, 690], [330, 810], [520, 760], [820, 860], [930, 800],
+      [1240, 490], [1370, 390], [1330, 600], [1390, 690], [70, 340], [160, 430]
+    ];
+    daisyCoords.forEach(([fx, fy]) => {
+      flowers.fillCircle(fx, fy, 2);
+      flowers.fillCircle(fx + 2.5, fy + 1, 1.5);
+    });
+
+    flowers.fillStyle(0xfde047, 0.9); // Buttercup yellow centers
+    daisyCoords.forEach(([fx, fy]) => {
+      flowers.fillCircle(fx + 1, fy, 1);
+    });
+
+    // 2. Road Network (Warm Cobblestone #EDE4D4 with border #BBA88C)
     this.drawRoadNetwork();
 
     // 3. Static Obstacles Group (Solid walls for collision)
@@ -207,8 +235,8 @@ export class VillageScene extends Phaser.Scene {
 
   private drawRoadNetwork() {
     const road = this.add.graphics();
-    road.fillStyle(0xeadfcb, 1);
-    road.lineStyle(3, 0xbdae92, 1);
+    road.fillStyle(0xede4d4, 1);
+    road.lineStyle(3, 0xbba88c, 1);
 
     const roads = [
       { x: 0, y: 496, w: 1440, h: 48 },
@@ -227,15 +255,15 @@ export class VillageScene extends Phaser.Scene {
     });
 
     // Town Square Decorative Plaza Ring around Central Fountain
-    road.fillStyle(0xddcfb5, 1);
+    road.fillStyle(0xe2d4bd, 1);
     road.fillCircle(630, 420, 52);
-    road.lineStyle(2, 0xbdae92, 0.85);
+    road.lineStyle(2.5, 0xbba88c, 0.9);
     road.strokeCircle(630, 420, 52);
     road.strokeCircle(630, 420, 36);
 
     // Stepping Stones connecting Roads to Building Doorsteps
-    road.fillStyle(0xeadfcb, 1);
-    road.lineStyle(2, 0xbdae92, 0.9);
+    road.fillStyle(0xede4d4, 1);
+    road.lineStyle(2, 0xbba88c, 0.95);
 
     const steppingStones = [
       // To Home Door (170, 228) -> (184, 290)
@@ -270,7 +298,7 @@ export class VillageScene extends Phaser.Scene {
     });
 
     // Authentic Cobblestone Texture Stones on Road
-    road.fillStyle(0xd9cdb6, 0.75);
+    road.fillStyle(0xdfcfb7, 0.75);
     for (let rx = 12; rx < 1430; rx += 28) {
       road.fillRoundedRect(rx, 502 + (rx % 3) * 10, 18, 9, 3);
     }
@@ -493,9 +521,9 @@ export class VillageScene extends Phaser.Scene {
 
       // Stagger project street badges so each has wide breathing room without any overlap
       if (place.id === 'project-pramaan' || place.id === 'project-data-engine') {
-        badgeY = place.zone.y - 48;
+        badgeY = place.zone.y - 58;
       } else if (place.id.startsWith('project-')) {
-        badgeY = place.zone.y - 14;
+        badgeY = place.zone.y - 12;
       } else if (place.id === 'tanish-ai-npc') {
         badgeX = 685;
         badgeY = 335;
@@ -511,10 +539,10 @@ export class VillageScene extends Phaser.Scene {
       const container = this.add.container(badgeX, badgeY);
       container.setDepth(2600);
 
-      // Large, Bold, Ultra-Crisp Retina Label Text
+      // Large, Bold, Ultra-Crisp Retina Label Text with modern Outfit typography
       const text = this.add.text(0, 0, place.label, {
-        fontFamily: 'Fredoka, Nunito, system-ui, sans-serif',
-        fontSize: '15px',
+        fontFamily: "'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif",
+        fontSize: '13.5px',
         color: '#261A10',
         fontStyle: '800',
         resolution: 3,
@@ -522,11 +550,11 @@ export class VillageScene extends Phaser.Scene {
       text.setOrigin(0, 0.5);
 
       const textW = text.width;
-      const badgeW = Math.max(textW + 44, 110);
-      const badgeH = 34;
+      const badgeW = Math.max(textW + 36, 92);
+      const badgeH = 30;
 
       // Position text with padding for colored indicator dot
-      text.setX(-badgeW / 2 + 25);
+      text.setX(-badgeW / 2 + 22);
 
       // Pill background
       const bg = this.add.graphics();
@@ -534,13 +562,13 @@ export class VillageScene extends Phaser.Scene {
         bg.clear();
         // 3D bottom drop shadow
         bg.fillStyle(0x261a10, 0.95);
-        bg.fillRoundedRect(-badgeW / 2, -badgeH / 2 + 4, badgeW, badgeH, 17);
+        bg.fillRoundedRect(-badgeW / 2, -badgeH / 2 + 3.5, badgeW, badgeH, 15);
         // Pill fill
-        bg.fillStyle(hover ? 0xffffff : 0xfff6e3, 1);
-        bg.fillRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 17);
+        bg.fillStyle(hover ? 0xffffff : 0xfffdf7, 1);
+        bg.fillRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 15);
         // Crisp Ink outline
-        bg.lineStyle(2.5, 0x261a10, 1);
-        bg.strokeRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 17);
+        bg.lineStyle(2.2, 0x261a10, 1);
+        bg.strokeRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 15);
       };
       drawBg(false);
 
@@ -548,9 +576,9 @@ export class VillageScene extends Phaser.Scene {
       const dot = this.add.graphics();
       const colorInt = parseInt((place.roofColor || '#F6B73C').replace('#', '0x'), 16);
       dot.fillStyle(colorInt, 1);
-      dot.fillCircle(-badgeW / 2 + 13, 0, 5.5);
-      dot.lineStyle(2, 0x261a10, 0.9);
-      dot.strokeCircle(-badgeW / 2 + 13, 0, 5.5);
+      dot.fillCircle(-badgeW / 2 + 11, 0, 4.5);
+      dot.lineStyle(1.8, 0x261a10, 0.95);
+      dot.strokeCircle(-badgeW / 2 + 11, 0, 4.5);
 
       container.add([bg, dot, text]);
       container.setSize(badgeW, badgeH);
@@ -620,10 +648,10 @@ export class VillageScene extends Phaser.Scene {
       bubble.setAlpha(0);
 
       const label = this.add.text(0, -2, cfg.text, {
-        fontFamily: 'Fredoka, Nunito, system-ui, sans-serif',
-        fontSize: '12px',
+        fontFamily: "'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif",
+        fontSize: '12.5px',
         color: '#261A10',
-        fontStyle: 'bold',
+        fontStyle: '800',
         resolution: 3,
       });
       label.setOrigin(0.5, 0.5);
@@ -793,6 +821,14 @@ export class VillageScene extends Phaser.Scene {
     const rippleRadius = 20 + Math.sin(this.time.now / 600) * 10;
     this.fxGraphics.lineStyle(1.5, 0xffffff, 0.35);
     this.fxGraphics.strokeEllipse(1290, 720, rippleRadius * 2, rippleRadius * 1.2);
+
+    // Animated Cyber Hologram Pedestal under Tanish AI NPC
+    const aiRingTime = this.time.now / 350;
+    const aiPulse = 0.55 + Math.sin(aiRingTime) * 0.35;
+    this.fxGraphics.lineStyle(2, 0x00f0ff, aiPulse * 0.95);
+    this.fxGraphics.strokeEllipse(685, 396, 28 + Math.sin(aiRingTime * 1.5) * 3, 12 + Math.sin(aiRingTime * 1.5) * 1.5);
+    this.fxGraphics.fillStyle(0x00f0ff, aiPulse * 0.22);
+    this.fxGraphics.fillEllipse(685, 396, 22, 9);
 
     // Animated Fountain Water Sprays with Cascading Drops & Basin Ripples
     const fTime = this.time.now / 150;

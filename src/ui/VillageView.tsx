@@ -9,7 +9,7 @@ import { Joystick } from './components/Joystick';
 import { QuestTracker } from './components/QuestTracker';
 import { Modal } from './components/Modal';
 import { IntroModal } from './components/IntroModal';
-import { Sparkles, Bot } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 import { AboutPanel } from './panels/AboutPanel';
 import { ProjectPanel } from './panels/ProjectPanel';
@@ -55,6 +55,13 @@ export const VillageView: React.FC = () => {
           activeEl.tagName === 'TEXTAREA' ||
           activeEl.getAttribute('contenteditable') === 'true')
       ) {
+        return;
+      }
+
+      if (!activePanel && (e.key === 'c' || e.key === 'C')) {
+        e.preventDefault();
+        soundEffects.playClick();
+        useGameStore.getState().openPanel('ai-chat');
         return;
       }
 
@@ -137,26 +144,84 @@ export const VillageView: React.FC = () => {
       <Joystick />
 
       {/* Floating Quick Action: Tanish AI Assistant - Lower Right Side (Above Minimap) */}
-      <div className="fixed bottom-6 right-6 md:bottom-[148px] md:right-4 z-30 pointer-events-auto flex flex-col items-end gap-1.5">
+      <div className="fixed bottom-6 right-6 md:bottom-[148px] md:right-4 z-30 pointer-events-auto flex items-center gap-2.5">
+        {/* Interactive Speech Balloon / Pill */}
         <button
           onClick={() => {
             soundEffects.playClick();
             openPanel('ai-chat');
           }}
-          className="group relative flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-[#FFF6E3] to-[#FFFBF2] hover:from-white hover:to-white border-[2.5px] border-[#3A2A1E] rounded-2xl shadow-[0_5px_0_#3A2A1E] text-xs font-extrabold text-[#3A2A1E] transition-all active:translate-y-1 active:shadow-none hover:scale-[1.03]"
-          title="Chat with Tanish AI Assistant"
+          className="group relative flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-[#FFFDF7] to-[#FFF6E3] hover:from-white hover:to-white border-[2.5px] border-[#261A10] rounded-2xl shadow-[0_4px_0_#261A10] text-[#261A10] transition-all hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
+          title="Chat with Tanish AI Companion (Press C)"
         >
-          {/* Animated online status dot */}
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-          </span>
-
-          <div className="w-6 h-6 rounded-lg bg-[#266F73] text-white flex items-center justify-center border border-[#3A2A1E]/30 shadow-inner group-hover:rotate-6 transition-transform">
-            <Bot className="w-3.5 h-3.5" />
+          <div className="flex flex-col text-left">
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-xs tracking-tight text-[#261A10]">
+                Ask Tanish AI
+              </span>
+              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-400/60 rounded text-[9px] font-black uppercase tracking-wider">
+                Active
+              </span>
+            </div>
+            <span className="text-[10px] font-semibold text-[#6B5A4B]">
+              LLM · RAG · GPU Optimization
+            </span>
           </div>
 
-          <span className="tracking-tight">Ask Tanish AI</span>
+          {/* Hotkey Pill */}
+          <span className="hidden sm:inline-block px-1.5 py-0.5 bg-[#261A10]/10 border border-[#261A10]/30 rounded text-[10px] font-mono font-black text-[#261A10]">
+            C
+          </span>
+
+          {/* Speech bubble pointer to bot orb */}
+          <span className="hidden sm:block absolute -right-2 top-1/2 -translate-y-1/2 w-0 h-0 border-y-[6px] border-y-transparent border-l-[8px] border-l-[#261A10]" />
+        </button>
+
+        {/* 3D Cyber Bot Companion Avatar Orb */}
+        <button
+          onClick={() => {
+            soundEffects.playClick();
+            openPanel('ai-chat');
+          }}
+          className="group relative w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-[#101F33] via-[#1B3252] to-[#0A1320] border-[2.8px] border-[#261A10] shadow-[0_5px_0_#261A10,0_0_20px_rgba(0,240,255,0.45)] flex items-center justify-center transition-all hover:scale-105 hover:-translate-y-1 active:translate-y-1 active:shadow-none cursor-pointer"
+          title="Open Tanish AI Companion (Press C)"
+        >
+          {/* Pulsing Live Halo Ring */}
+          <span className="absolute -inset-1 rounded-2xl border-2 border-[#00F0FF]/40 animate-ping pointer-events-none" />
+
+          {/* Status Online Green Pip */}
+          <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 z-10">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-[#261A10]" />
+          </span>
+
+          {/* Cyber Bot Graphic (High-Detail SVG) */}
+          <svg
+            className="w-7 h-7 sm:w-8 sm:h-8 text-cyan-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] transition-transform group-hover:rotate-6 group-hover:scale-110"
+            viewBox="0 0 36 36"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Top Antenna */}
+            <line x1="18" y1="2" x2="18" y2="7" stroke="#F6B73C" strokeWidth="2.5" strokeLinecap="round" />
+            <circle cx="18" cy="2" r="2.5" fill="#00F0FF" stroke="#261A10" strokeWidth="1" />
+
+            {/* Head Shell */}
+            <rect x="5" y="7" width="26" height="23" rx="7" fill="#1E293B" stroke="#00F0FF" strokeWidth="1.8" />
+
+            {/* Ear Cups */}
+            <rect x="2" y="13" width="3" height="11" rx="1.5" fill="#00F0FF" />
+            <rect x="31" y="13" width="3" height="11" rx="1.5" fill="#00F0FF" />
+
+            {/* Glowing Visor Screen */}
+            <rect x="8" y="11" width="20" height="13" rx="4" fill="#06121E" stroke="#00F0FF" strokeWidth="1.2" />
+
+            {/* Glowing Visor Eyes (Cyber Sparkles) */}
+            <circle cx="13" cy="17.5" r="2.2" fill="#00F0FF" className="animate-pulse" />
+            <circle cx="23" cy="17.5" r="2.2" fill="#00F0FF" className="animate-pulse" />
+            {/* Cute smiling mouth LED bar */}
+            <path d="M15 21 Q18 23 21 21" stroke="#00F0FF" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+          </svg>
         </button>
       </div>
 

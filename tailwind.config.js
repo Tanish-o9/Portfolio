@@ -26,8 +26,9 @@ export default {
         'secondary-border': '#2A3A5C',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
+        sans: ["'Plus Jakarta Sans'", "'Outfit'", "'Inter'", 'system-ui', '-apple-system', 'sans-serif'],
+        display: ["'Outfit'", "'Fredoka'", 'sans-serif'],
+        mono: ["'JetBrains Mono'", 'monospace'],
       },
       borderRadius: {
         card: '16px',

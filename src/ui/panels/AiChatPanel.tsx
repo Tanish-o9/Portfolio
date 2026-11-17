@@ -88,18 +88,37 @@ export const AiChatPanel: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Bot Persona Banner */}
-      <div className="p-3 bg-white/90 border-2 border-[#3A2A1E] rounded-xl shadow-[0_2px_0_#3A2A1E] flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-[#00F0FF] border-2 border-[#3A2A1E] flex items-center justify-center text-[#3A2A1E] shadow-sm">
-            <Bot className="w-5 h-5" />
+      <div className="p-3.5 bg-gradient-to-r from-white to-[#FFFDF7] border-2 border-[#3A2A1E] rounded-xl shadow-[0_2px_0_#3A2A1E] flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#101F33] via-[#1B3252] to-[#0A1320] border-2 border-[#3A2A1E] flex items-center justify-center text-[#00F0FF] shadow-md relative">
+            {/* Cyber Bot Graphic */}
+            <svg
+              className="w-7 h-7"
+              viewBox="0 0 36 36"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <line x1="18" y1="2" x2="18" y2="7" stroke="#F6B73C" strokeWidth="2.5" strokeLinecap="round" />
+              <circle cx="18" cy="2" r="2.5" fill="#00F0FF" stroke="#261A10" strokeWidth="1" />
+              <rect x="5" y="7" width="26" height="23" rx="7" fill="#1E293B" stroke="#00F0FF" strokeWidth="1.8" />
+              <rect x="2" y="13" width="3" height="11" rx="1.5" fill="#00F0FF" />
+              <rect x="31" y="13" width="3" height="11" rx="1.5" fill="#00F0FF" />
+              <rect x="8" y="11" width="20" height="13" rx="4" fill="#06121E" stroke="#00F0FF" strokeWidth="1.2" />
+              <circle cx="13" cy="17.5" r="2.2" fill="#00F0FF" />
+              <circle cx="23" cy="17.5" r="2.2" fill="#00F0FF" />
+              <path d="M15 21 Q18 23 21 21" stroke="#00F0FF" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+            </svg>
+            <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border border-white animate-pulse" />
           </div>
           <div>
-            <div className="font-extrabold text-sm text-[#3A2A1E] flex items-center gap-1.5">
+            <div className="font-extrabold text-sm text-[#3A2A1E] flex items-center gap-2">
               <span>Tanish AI Companion</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-400 rounded text-[9px] font-black uppercase">
+                Active
+              </span>
             </div>
             <p className="text-[11px] text-[#4A382B]/80 font-mono">
-              Trained on verified resume & engineering projects
+              Trained on verified resume, GPU optimizations & engineering systems
             </p>
           </div>
         </div>

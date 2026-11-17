@@ -88,7 +88,7 @@ export const PLACES: Place[] = [
   {
     id: 'project-whytrace',
     name: 'WhyTrace.ai HQ',
-    label: 'WhyTrace.ai · Detective Office',
+    label: 'WhyTrace.ai · Agent Eval',
     panel: 'project',
     projectId: 'whytrace-ai',
     zone: { x: 1020, y: 280, width: 90, height: 90 },
@@ -99,7 +99,7 @@ export const PLACES: Place[] = [
   {
     id: 'project-data-engine',
     name: 'LLM Data Engine',
-    label: 'LLM Data Engine · Workshop',
+    label: 'LLM Data Engine',
     panel: 'project',
     projectId: 'llm-data-engine',
     zone: { x: 1145, y: 280, width: 90, height: 90 },
@@ -110,7 +110,7 @@ export const PLACES: Place[] = [
   {
     id: 'project-mini-vlm',
     name: 'Mini VLM Observatory',
-    label: 'Mini VLM · Observatory',
+    label: 'Mini VLM · Vision',
     panel: 'project',
     projectId: 'mini-vlm',
     zone: { x: 1270, y: 280, width: 90, height: 90 },
