@@ -83,8 +83,8 @@ export class VillageScene extends Phaser.Scene {
     // Set world and physics bounds
     this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
 
-    // 1. Ground: Lush warm meadow grass base extending comfortably beyond bounds
-    this.add.rectangle(worldWidth / 2, worldHeight / 2, worldWidth + 800, worldHeight + 600, 0x8ac46e);
+    // 1. Ground: Lush warm meadow grass base extending seamlessly across any screen
+    this.add.rectangle(worldWidth / 2, worldHeight / 2, 4400, 3200, 0x8ac46e);
 
     // Subtle meadow rolling hills variation
     const patches = this.add.graphics();
@@ -138,10 +138,27 @@ export class VillageScene extends Phaser.Scene {
     this.player = new Player(this, 700, 585);
     this.physics.add.collider(this.player, this.obstacles);
 
-    // 6. Camera Setup: Lerp follow, clamped with generous pan margin
+    // 6. Camera Setup: Lerp follow, clamped with generous pan margin & responsive full-screen scaling
     const cam = this.cameras.main;
-    cam.setBounds(-120, -90, worldWidth + 240, worldHeight + 180);
-    cam.setZoom(1.05);
+    cam.setBackgroundColor('#8AC46E');
+    cam.setBounds(-400, -300, worldWidth + 800, worldHeight + 600);
+
+    const updateResponsiveZoom = () => {
+      const w = this.scale.width;
+      let targetZoom = 1.05;
+      if (w < 640) {
+        // Mobile portrait: scale comfortably so village is fully visible without cramped sides
+        targetZoom = Math.max(0.68, Math.min(0.85, w / 540));
+      } else if (w < 1024) {
+        targetZoom = 0.92;
+      } else {
+        targetZoom = 1.05;
+      }
+      cam.setZoom(targetZoom);
+    };
+    updateResponsiveZoom();
+    this.scale.on('resize', updateResponsiveZoom);
+
     cam.startFollow(this.player, true, 0.08, 0.08);
     this.isFollowActive = true;
 
@@ -201,9 +218,14 @@ export class VillageScene extends Phaser.Scene {
         cam.scrollX -= (pointer.x - pointer.prevPosition.x) / cam.zoom;
         cam.scrollY -= (pointer.y - pointer.prevPosition.y) / cam.zoom;
 
-        // Clamp camera to world bounds with pan margin
-        cam.scrollX = Phaser.Math.Clamp(cam.scrollX, -120, 1440 + 120 - cam.width / cam.zoom);
-        cam.scrollY = Phaser.Math.Clamp(cam.scrollY, -90, 900 + 90 - cam.height / cam.zoom);
+        // Clamp camera to world bounds with generous pan margin
+        const minX = -350;
+        const maxX = Math.max(minX, 1440 + 350 - cam.width / cam.zoom);
+        cam.scrollX = Phaser.Math.Clamp(cam.scrollX, minX, maxX);
+
+        const minY = -250;
+        const maxY = Math.max(minY, 900 + 250 - cam.height / cam.zoom);
+        cam.scrollY = Phaser.Math.Clamp(cam.scrollY, minY, maxY);
       }
     });
 

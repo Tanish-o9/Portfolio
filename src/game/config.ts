@@ -8,10 +8,8 @@ export const GAME_HEIGHT = 900;
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: GAME_WIDTH,
-  height: GAME_HEIGHT,
   parent: 'phaser-container',
-  backgroundColor: '#94CF7A',
+  backgroundColor: '#8AC46E',
   pixelArt: false,
   roundPixels: true,
   antialias: true,
@@ -23,8 +21,10 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
     },
   },
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: '100%',
+    height: '100%',
   },
   scene: [BootScene, PreloadScene, VillageScene],
 };

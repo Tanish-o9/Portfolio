@@ -118,7 +118,7 @@ export const VillageView: React.FC = () => {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#94CF7A] select-none">
+    <div className="relative w-screen h-screen overflow-hidden bg-[#8AC46E] select-none">
       {/* Intro Modal (One-time screen & sound unlock) */}
       <IntroModal />
 
