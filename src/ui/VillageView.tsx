@@ -5,7 +5,6 @@ import { useGameStore } from '../state/gameStore';
 import { Hud } from './components/Hud';
 import { Minimap } from './components/Minimap';
 import { Joystick } from './components/Joystick';
-import { PlaceLabels } from './components/PlaceLabels';
 import { Modal } from './components/Modal';
 import { IntroModal } from './components/IntroModal';
 import { Sparkles } from 'lucide-react';
@@ -83,9 +82,6 @@ export const VillageView: React.FC = () => {
       {season === 'evening' && (
         <div className="absolute inset-0 pointer-events-none bg-[#7B6BC4]/20 mix-blend-multiply z-10" />
       )}
-
-      {/* Floating Place Labels (Interactive Roof Buttons) */}
-      <PlaceLabels />
 
       {/* HUD Overlays */}
       <Hud />

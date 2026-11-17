@@ -45,8 +45,8 @@ export class VillageScene extends Phaser.Scene {
     // Set world and physics bounds
     this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
 
-    // 1. Ground: Lush grass base
-    this.add.rectangle(worldWidth / 2, worldHeight / 2, worldWidth, worldHeight, 0x94cf7a);
+    // 1. Ground: Lush grass base extending comfortably beyond bounds
+    this.add.rectangle(worldWidth / 2, worldHeight / 2, worldWidth + 800, worldHeight + 600, 0x94cf7a);
 
     // Subtle grass patch variation
     const patches = this.add.graphics();
@@ -72,9 +72,10 @@ export class VillageScene extends Phaser.Scene {
     this.player = new Player(this, 700, 585);
     this.physics.add.collider(this.player, this.obstacles);
 
-    // 6. Camera Setup: Lerp follow, clamped to bounds
+    // 6. Camera Setup: Lerp follow, clamped with generous pan margin
     const cam = this.cameras.main;
-    cam.setBounds(0, 0, worldWidth, worldHeight);
+    cam.setBounds(-120, -90, worldWidth + 240, worldHeight + 180);
+    cam.setZoom(1.05);
     cam.startFollow(this.player, true, 0.08, 0.08);
     this.isFollowActive = true;
 
@@ -134,9 +135,9 @@ export class VillageScene extends Phaser.Scene {
         cam.scrollX -= (pointer.x - pointer.prevPosition.x) / cam.zoom;
         cam.scrollY -= (pointer.y - pointer.prevPosition.y) / cam.zoom;
 
-        // Clamp camera to world bounds
-        cam.scrollX = Phaser.Math.Clamp(cam.scrollX, 0, 1440 - cam.width / cam.zoom);
-        cam.scrollY = Phaser.Math.Clamp(cam.scrollY, 0, 900 - cam.height / cam.zoom);
+        // Clamp camera to world bounds with pan margin
+        cam.scrollX = Phaser.Math.Clamp(cam.scrollX, -120, 1440 + 120 - cam.width / cam.zoom);
+        cam.scrollY = Phaser.Math.Clamp(cam.scrollY, -90, 900 + 90 - cam.height / cam.zoom);
       }
     });
 
@@ -154,7 +155,7 @@ export class VillageScene extends Phaser.Scene {
 
     // Mouse wheel zoom
     this.input.on('wheel', (_pointer: Phaser.Input.Pointer, _gameObjects: unknown, _deltaX: number, deltaY: number) => {
-      const newZoom = Phaser.Math.Clamp(cam.zoom - deltaY * 0.001, 0.75, 1.35);
+      const newZoom = Phaser.Math.Clamp(cam.zoom - deltaY * 0.001, 0.8, 1.45);
       cam.setZoom(newZoom);
     });
   }
@@ -294,6 +295,122 @@ export class VillageScene extends Phaser.Scene {
     const postNpc = this.add.image(760, 760, 'npc_postmaster');
     postNpc.setOrigin(0.5, 0.9);
     postNpc.setDepth(760);
+
+    // 4. Interactive World-Space Badges for all Buildings (Locked to world coordinates)
+    this.createPlaceBadges();
+  }
+
+  private createPlaceBadges() {
+    PLACES.forEach((place) => {
+      let badgeX = place.zone.x + place.zone.width / 2;
+      let badgeY = place.zone.y - 14;
+
+      // Stagger project street badges so they have ample breathing room without overlapping
+      if (place.id === 'project-pramaan' || place.id === 'project-data-engine') {
+        badgeY = place.zone.y - 32;
+      } else if (place.id.startsWith('project-')) {
+        badgeY = place.zone.y - 12;
+      } else if (place.id === 'tanish-ai-npc') {
+        badgeX = 685;
+        badgeY = 340;
+      } else if (place.id === 'guestbook-stand') {
+        badgeX = 610;
+        badgeY = 312;
+      } else if (place.id === 'cloud-tower') {
+        badgeY = place.zone.y - 4;
+      } else if (place.id === 'library') {
+        badgeY = place.zone.y - 18;
+      }
+
+      const container = this.add.container(badgeX, badgeY);
+      container.setDepth(2600);
+
+      // Label text
+      const text = this.add.text(0, 0, place.label, {
+        fontFamily: 'Fredoka, Nunito, system-ui, sans-serif',
+        fontSize: '11px',
+        color: '#3A2A1E',
+        fontStyle: 'bold',
+      });
+      text.setOrigin(0, 0.5);
+
+      const textW = text.width;
+      const badgeW = Math.max(textW + 36, 85);
+      const badgeH = 26;
+
+      // Position text with padding for colored indicator dot
+      text.setX(-badgeW / 2 + 22);
+
+      // Pill background
+      const bg = this.add.graphics();
+      const drawBg = (hover = false) => {
+        bg.clear();
+        // 3D bottom drop shadow
+        bg.fillStyle(0x3a2a1e, 0.9);
+        bg.fillRoundedRect(-badgeW / 2, -badgeH / 2 + 3, badgeW, badgeH, 13);
+        // Pill fill
+        bg.fillStyle(hover ? 0xffffff : 0xfff6e3, 1);
+        bg.fillRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 13);
+        // Ink outline
+        bg.lineStyle(2, 0x3a2a1e, 1);
+        bg.strokeRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 13);
+      };
+      drawBg(false);
+
+      // Colored roof indicator dot
+      const dot = this.add.graphics();
+      const colorInt = parseInt((place.roofColor || '#F6B73C').replace('#', '0x'), 16);
+      dot.fillStyle(colorInt, 1);
+      dot.fillCircle(-badgeW / 2 + 11, 0, 4.5);
+      dot.lineStyle(1.5, 0x3a2a1e, 0.8);
+      dot.strokeCircle(-badgeW / 2 + 11, 0, 4.5);
+
+      container.add([bg, dot, text]);
+      container.setSize(badgeW, badgeH);
+      container.setInteractive({ useHandCursor: true });
+
+      let pointerDownX = 0;
+      let pointerDownY = 0;
+
+      container.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        pointerDownX = pointer.x;
+        pointerDownY = pointer.y;
+      });
+
+      container.on('pointerover', () => {
+        drawBg(true);
+        this.tweens.add({
+          targets: container,
+          scale: 1.07,
+          duration: 100,
+          ease: 'Sine.easeOut',
+        });
+      });
+
+      container.on('pointerout', () => {
+        drawBg(false);
+        this.tweens.add({
+          targets: container,
+          scale: 1.0,
+          duration: 100,
+          ease: 'Sine.easeOut',
+        });
+      });
+
+      container.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+        const dist = Phaser.Math.Distance.Between(pointerDownX, pointerDownY, pointer.x, pointer.y);
+        // Trigger only if user clicked/tapped (not dragged to pan)
+        if (dist < 8 && !this.isDragging) {
+          soundEffects.playClick();
+          useGameStore.getState().markVisited(place.id);
+          if (place.panel) {
+            useGameStore.getState().openPanel(place.panel, place.projectId);
+          } else if (place.externalUrl) {
+            window.open(place.externalUrl, '_blank', 'noopener,noreferrer');
+          }
+        }
+      });
+    });
   }
 
   private initAmbientParticles() {
