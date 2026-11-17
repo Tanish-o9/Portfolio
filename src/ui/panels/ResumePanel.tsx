@@ -4,7 +4,7 @@ import { resumeContent } from '../../data/content';
 
 export const ResumePanel: React.FC = () => {
   const resumeUrl = '/documents/Tanish_Kumar_Resume.pdf';
-  const [viewMode, setViewMode] = useState<'pdf' | 'digital'>('pdf');
+  const [viewMode, setViewMode] = useState<'pdf' | 'digital'>('digital');
 
   return (
     <div className="space-y-4">
@@ -12,18 +12,6 @@ export const ResumePanel: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-white/90 border-2 border-[#3A2A1E] rounded-xl shadow-[0_3px_0_#3A2A1E]">
         <div className="flex items-center gap-2">
           {/* View toggle */}
-          <button
-            onClick={() => setViewMode('pdf')}
-            className={`px-3 py-1.5 rounded-lg border-2 border-[#3A2A1E] text-xs font-bold transition-all flex items-center gap-1.5 ${
-              viewMode === 'pdf'
-                ? 'bg-[#F6B73C] shadow-[0_2px_0_#3A2A1E]'
-                : 'bg-[#FFF6E3] hover:bg-white text-[#4A382B]'
-            }`}
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>PDF Viewer</span>
-          </button>
-
           <button
             onClick={() => setViewMode('digital')}
             className={`px-3 py-1.5 rounded-lg border-2 border-[#3A2A1E] text-xs font-bold transition-all flex items-center gap-1.5 ${
@@ -33,7 +21,19 @@ export const ResumePanel: React.FC = () => {
             }`}
           >
             <Eye className="w-3.5 h-3.5" />
-            <span>Digital Resume</span>
+            <span>Digital Resume (Recommended)</span>
+          </button>
+
+          <button
+            onClick={() => setViewMode('pdf')}
+            className={`px-3 py-1.5 rounded-lg border-2 border-[#3A2A1E] text-xs font-bold transition-all flex items-center gap-1.5 ${
+              viewMode === 'pdf'
+                ? 'bg-[#F6B73C] shadow-[0_2px_0_#3A2A1E]'
+                : 'bg-[#FFF6E3] hover:bg-white text-[#4A382B]'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>PDF File</span>
           </button>
         </div>
 
@@ -62,12 +62,48 @@ export const ResumePanel: React.FC = () => {
       {/* Main Content Area */}
       {viewMode === 'pdf' ? (
         <div className="relative rounded-xl border-2 border-[#3A2A1E] bg-white shadow-[0_4px_0_#3A2A1E] overflow-hidden">
-          {/* Embedded Native PDF Viewer */}
-          <iframe
-            src={`${resumeUrl}#toolbar=0&navpanes=0&scrollbar=1`}
-            title="Tanish Kumar Resume PDF"
+          {/* Robust PDF Viewer with Object Embed & Fallback */}
+          <object
+            data={`${resumeUrl}#toolbar=0&navpanes=0&scrollbar=1`}
+            type="application/pdf"
             className="w-full h-[540px] sm:h-[600px] border-none bg-white"
-          />
+          >
+            <iframe
+              src={`${resumeUrl}#toolbar=0&navpanes=0&scrollbar=1`}
+              title="Tanish Kumar Resume PDF"
+              className="w-full h-[540px] sm:h-[600px] border-none bg-white"
+            >
+              <div className="p-8 text-center flex flex-col items-center justify-center h-full gap-4 bg-[#FFFDF7]">
+                <FileText className="w-12 h-12 text-[#266F73]" />
+                <div>
+                  <h4 className="font-extrabold text-base text-[#3A2A1E]">
+                    Tanish Kumar &mdash; Resume PDF
+                  </h4>
+                  <p className="text-xs text-[#6B5A4B] mt-1 max-w-md">
+                    Click below to open the official PDF in a full-page viewer or switch to the interactive Digital Resume tab.
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <a
+                    href={resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-[#266F73] text-white rounded-xl text-xs font-bold border-2 border-[#3A2A1E] shadow-[0_2px_0_#3A2A1E] flex items-center gap-1.5 hover:bg-[#2e8a8f]"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Open PDF in New Tab</span>
+                  </a>
+                  <button
+                    onClick={() => setViewMode('digital')}
+                    className="px-4 py-2 bg-[#F6B73C] text-[#3A2A1E] rounded-xl text-xs font-bold border-2 border-[#3A2A1E] shadow-[0_2px_0_#3A2A1E] flex items-center gap-1.5 hover:bg-[#ffc652]"
+                  >
+                    <Eye className="w-4 h-4" />
+                    <span>View Digital Resume</span>
+                  </button>
+                </div>
+              </div>
+            </iframe>
+          </object>
 
           <div className="p-2.5 bg-[#FFF1D6] border-t-2 border-[#3A2A1E] text-center text-[11px] font-mono text-[#4A382B] flex items-center justify-center gap-2">
             <span>Scroll directly inside the viewer to read all sections.</span>
