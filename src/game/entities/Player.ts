@@ -77,6 +77,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       if (right) vx += 1;
       if (up) vy -= 1;
       if (down) vy += 1;
+
+      // Immediately re-engage camera follow when keyboard input is detected
+      (this.scene as unknown as { recenterCamera?: () => void }).recenterCamera?.();
     } else if (this.targetPoint) {
       // Tap / Click-to-move navigation
       const dist = Phaser.Math.Distance.Between(this.x, this.y, this.targetPoint.x, this.targetPoint.y);

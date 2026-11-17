@@ -6,7 +6,7 @@ export interface MinimapProps {
   playerY?: number;
 }
 
-export const Minimap: React.FC<MinimapProps> = ({ playerX = 700, playerY = 585 }) => {
+export const Minimap: React.FC<MinimapProps> = ({ playerX = 675, playerY = 520 }) => {
   // World scale: 1440x900 to 190x123
   const scaleX = 190 / 1440;
   const scaleY = 123 / 900;

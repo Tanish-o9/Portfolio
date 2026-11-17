@@ -134,14 +134,14 @@ export class VillageScene extends Phaser.Scene {
     // 4. Place Buildings & Interactive Zones
     this.setupBuildingsAndZones();
 
-    // 5. Spawn Player at Crossroads (700, 585)
-    this.player = new Player(this, 700, 585);
+    // 5. Spawn Player at Crossroads (675, 520) - wide open cobblestone crossroads
+    this.player = new Player(this, 675, 520);
     this.physics.add.collider(this.player, this.obstacles);
 
-    // 6. Camera Setup: Lerp follow, clamped with generous pan margin & responsive full-screen scaling
+    // 6. Camera Setup: Lerp follow, unclamped so player & village are always dead center
     const cam = this.cameras.main;
     cam.setBackgroundColor('#8AC46E');
-    cam.setBounds(-400, -300, worldWidth + 800, worldHeight + 600);
+    cam.removeBounds();
 
     const updateResponsiveZoom = () => {
       const w = this.scale.width;
@@ -207,8 +207,8 @@ export class VillageScene extends Phaser.Scene {
       const dx = pointer.x - this.dragStartX;
       const dy = pointer.y - this.dragStartY;
 
-      // If dragged more than 6 pixels, enter drag-pan mode
-      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+      // Only enter drag-pan mode if dragged more than 16 pixels
+      if (Math.abs(dx) > 16 || Math.abs(dy) > 16) {
         this.isDragging = true;
         if (this.isFollowActive) {
           cam.stopFollow();
@@ -218,27 +218,27 @@ export class VillageScene extends Phaser.Scene {
         cam.scrollX -= (pointer.x - pointer.prevPosition.x) / cam.zoom;
         cam.scrollY -= (pointer.y - pointer.prevPosition.y) / cam.zoom;
 
-        // Clamp camera to world bounds with generous pan margin
-        const minX = -350;
-        const maxX = Math.max(minX, 1440 + 350 - cam.width / cam.zoom);
-        cam.scrollX = Phaser.Math.Clamp(cam.scrollX, minX, maxX);
-
-        const minY = -250;
-        const maxY = Math.max(minY, 900 + 250 - cam.height / cam.zoom);
-        cam.scrollY = Phaser.Math.Clamp(cam.scrollY, minY, maxY);
+        // Generous world pan bounds so view is never clipped or trapped
+        cam.scrollX = Phaser.Math.Clamp(cam.scrollX, -1000, 2000);
+        cam.scrollY = Phaser.Math.Clamp(cam.scrollY, -800, 1600);
       }
     });
 
     this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
       canvas.style.cursor = 'grab';
 
-      // If not dragging, it's a tap/click-to-move
-      if (!this.isDragging) {
+      const dx = pointer.x - this.dragStartX;
+      const dy = pointer.y - this.dragStartY;
+      const dist = Math.hypot(dx, dy);
+
+      // If not dragging or small jitter, it is a tap/click-to-move
+      if (!this.isDragging || dist < 16) {
         const worldX = pointer.worldX;
         const worldY = pointer.worldY;
         this.player.setTarget(worldX, worldY);
         this.recenterCamera();
       }
+      this.isDragging = false;
     });
 
     // Mouse wheel zoom
@@ -248,9 +248,10 @@ export class VillageScene extends Phaser.Scene {
     });
   }
 
-  private recenterCamera() {
+  public recenterCamera() {
+    const cam = this.cameras.main;
     if (!this.isFollowActive) {
-      this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+      cam.startFollow(this.player, true, 0.08, 0.08);
       this.isFollowActive = true;
     }
   }
@@ -347,9 +348,10 @@ export class VillageScene extends Phaser.Scene {
       img.setOrigin(0, 0);
       img.setDepth(y + img.height - 10);
 
+      // Place obstacle collider on top roof / back wall so front door and porch are 100% walkable
       const obs = this.obstacles.create(
         x + img.width / 2,
-        y + img.height - colliderH / 2,
+        y + colliderH / 2 + 10,
         undefined
       ) as Phaser.Physics.Arcade.Sprite;
       obs.setVisible(false);
@@ -645,8 +647,8 @@ export class VillageScene extends Phaser.Scene {
 
       container.on('pointerup', (pointer: Phaser.Input.Pointer) => {
         const dist = Phaser.Math.Distance.Between(pointerDownX, pointerDownY, pointer.x, pointer.y);
-        // Trigger only if user clicked/tapped (not dragged to pan)
-        if (dist < 8 && !this.isDragging) {
+        // Trigger if user clicked/tapped (dist < 16)
+        if (dist < 16) {
           soundEffects.playClick();
           useGameStore.getState().markVisited(place.id);
           if (place.panel) {
