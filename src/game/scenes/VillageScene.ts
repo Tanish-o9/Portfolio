@@ -296,8 +296,10 @@ export class VillageScene extends Phaser.Scene {
       [1148, 222, 18, 12], [1146, 238, 18, 12],
       // To College Door (180, 748) -> (184, 520)
       [180, 730, 18, 14], [182, 705, 18, 14], [184, 680, 18, 14],
-      // To Post Office Door (675, 772) -> (676, 800)
+      // To Resume Pavilion Door (675, 772) -> (676, 800)
       [675, 786, 18, 12],
+      // To Post Office Door (440, 445) -> Main road
+      [440, 462, 18, 12], [440, 482, 18, 12],
       // To Workshop Door (1025, 758) -> (1036, 520)
       [1028, 735, 18, 14], [1032, 710, 18, 14], [1034, 680, 18, 14],
       // Project Street Doorsteps
@@ -311,7 +313,7 @@ export class VillageScene extends Phaser.Scene {
 
     // Welcome Doormats at each Building Entrance
     PLACES.forEach((p) => {
-      if (p.id === 'tanish-ai-npc' || p.id === 'guestbook-stand' || p.id === 'notice-board') return;
+      if (p.id === 'tanish-ai-npc' || p.id === 'guestbook-stand') return;
       const matColor = parseInt(p.roofColor.replace('#', '0x'), 16);
       road.fillStyle(matColor, 0.95);
       road.fillRoundedRect(p.doorPoint.x - 14, p.doorPoint.y - 5, 28, 10, 3);
@@ -378,9 +380,11 @@ export class VillageScene extends Phaser.Scene {
     addBuildingObject('bldg_data_engine', 1145, 280, 80, 45, 'project-data-engine');
     addBuildingObject('bldg_mini_vlm', 1270, 280, 80, 45, 'project-mini-vlm');
     addBuildingObject('bldg_college', 100, 610, 140, 65, 'college');
-    addBuildingObject('bldg_post_office', 605, 655, 120, 50, 'post-office');
+    // Grand Resume Pavilion (Prominently placed directly facing player spawn)
+    addBuildingObject('bldg_resume', 605, 655, 120, 50, 'notice-board');
     addBuildingObject('bldg_workshop', 960, 640, 110, 50, 'workshop-sign');
-    addBuildingObject('prop_notice_board', 400, 380, 50, 25, 'notice-board');
+    // Post Office (Contact Station)
+    addBuildingObject('bldg_post_office', 390, 360, 80, 45, 'post-office');
     addBuildingObject('prop_guestbook', 580, 330, 40, 25, 'guestbook-stand');
 
     // Pond
@@ -448,12 +452,17 @@ export class VillageScene extends Phaser.Scene {
     libNpc.setOrigin(0.5, 0.9);
     libNpc.setDepth(220);
 
-    // 3. Postmaster near Post Office
-    const postNpc = this.add.image(760, 760, 'npc_postmaster');
+    // 3. Postmaster near Post Office at (390, 360)
+    const postNpc = this.add.image(475, 430, 'npc_postmaster');
     postNpc.setOrigin(0.5, 0.9);
-    postNpc.setDepth(760);
+    postNpc.setDepth(430);
 
-    this.npcs.push(aiNpc, libNpc, postNpc);
+    // 4. Career Scholar near Resume Pavilion at (605, 655)
+    const scholarNpc = this.add.image(745, 760, 'npc_librarian');
+    scholarNpc.setOrigin(0.5, 0.9);
+    scholarNpc.setDepth(760);
+
+    this.npcs.push(aiNpc, libNpc, postNpc, scholarNpc);
 
     // 4. Rich Environment Props (Town Square Fountain, Benches, Gardens, Fences)
     // Town Square Fountain Centerpiece
@@ -477,10 +486,10 @@ export class VillageScene extends Phaser.Scene {
     bike.setOrigin(0.5, 0.85);
     bike.setDepth(175);
 
-    // Red Postbox outside Post Office
-    const pbox = this.add.image(585, 755, 'prop_postbox');
+    // Red Postbox outside Post Office at (390, 360)
+    const pbox = this.add.image(380, 435, 'prop_postbox');
     pbox.setOrigin(0.5, 0.85);
-    pbox.setDepth(755);
+    pbox.setDepth(435);
 
     // Crossroads Signpost
     const sp = this.add.image(655, 545, 'prop_signpost');
@@ -660,7 +669,8 @@ export class VillageScene extends Phaser.Scene {
     const bubbleConfigs = [
       { id: 'tanish', x: 685, y: 340, text: '👋 Hi! Ask me about QUANTORA, RAG & LLMs!' },
       { id: 'librarian', x: 640, y: 175, text: '📚 7 Skill Bookshelves Inside!' },
-      { id: 'postmaster', x: 760, y: 715, text: '📬 Looking to Hire or Connect? Drop a Message!' },
+      { id: 'scholar', x: 745, y: 715, text: '📄 Check out Tanish\'s Verified ATS Resume & CV!' },
+      { id: 'postmaster', x: 475, y: 385, text: '📬 Looking to Hire or Connect? Drop a Message!' },
     ];
 
     bubbleConfigs.forEach((cfg) => {
@@ -716,7 +726,8 @@ export class VillageScene extends Phaser.Scene {
     const npcPositions: Record<string, { x: number; y: number }> = {
       tanish: { x: 685, y: 390 },
       librarian: { x: 640, y: 220 },
-      postmaster: { x: 760, y: 760 },
+      scholar: { x: 745, y: 760 },
+      postmaster: { x: 475, y: 430 },
     };
 
     this.npcBubbles.forEach((bubble, id) => {

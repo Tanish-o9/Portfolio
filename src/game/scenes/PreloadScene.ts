@@ -240,11 +240,33 @@ export class PreloadScene extends Phaser.Scene {
       g.fillRect(79, 15, 5, 2);
     });
 
-    makeBuilding('bldg_post_office', 140, 110, 0xd9503f, 0xfff6e3, (g) => {
+    // Resume Pavilion (prominently located in front of player spawn): 140x110
+    makeBuilding('bldg_resume', 140, 110, 0xf6b73c, 0xfff8ec, (g) => {
+      // Golden Document / Resume Emblem above door
+      g.fillStyle(0x3a2a1e, 1);
+      g.fillRoundedRect(56, 10, 28, 18, 3);
       g.fillStyle(0xffffff, 1);
-      g.fillRect(60, 14, 20, 12);
+      g.fillRoundedRect(58, 12, 24, 14, 2);
+      // Blue resume header bar & golden star badge
+      g.fillStyle(0x4f8cff, 1);
+      g.fillRect(60, 14, 14, 3);
+      g.fillStyle(0xf6b73c, 1);
+      g.fillCircle(78, 15.5, 2.5);
+      // Text lines representing verified ATS CV
+      g.fillStyle(0x8a7b6a, 1);
+      g.fillRect(60, 19, 20, 2);
+      g.fillRect(60, 22, 16, 2);
+    });
+
+    // Post Office (Contact Station): 90x85 with postal envelope emblem
+    makeBuilding('bldg_post_office', 90, 85, 0xd9503f, 0xfff6e3, (g) => {
+      // White envelope with red postal flap
+      g.fillStyle(0x3a2a1e, 1);
+      g.fillRoundedRect(34, 10, 22, 14, 3);
+      g.fillStyle(0xffffff, 1);
+      g.fillRoundedRect(35, 11, 20, 12, 2);
       g.fillStyle(0xd9503f, 1);
-      g.fillRect(62, 16, 16, 8);
+      g.fillTriangle(35, 11, 55, 11, 45, 18);
     });
 
     makeBuilding('bldg_workshop', 130, 110, 0x3a2a1e, 0xdfcbb5, (g) => {

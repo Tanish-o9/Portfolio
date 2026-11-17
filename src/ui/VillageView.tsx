@@ -103,7 +103,7 @@ export const VillageView: React.FC = () => {
       case 'contact':
         return 'Post Office: Contact';
       case 'resume':
-        return 'Notice Board: Resume';
+        return 'Resume Pavilion: ATS Resume & CV';
       case 'guestbook':
         return 'Town Square Guestbook';
       case 'terminal':
