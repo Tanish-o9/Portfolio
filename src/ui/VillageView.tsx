@@ -21,6 +21,7 @@ import { ResumePanel } from './panels/ResumePanel';
 import { GuestbookPanel } from './panels/GuestbookPanel';
 import { TerminalPanel } from './panels/TerminalPanel';
 import { AiChatPanel } from './panels/AiChatPanel';
+import { EasterEggPanel } from './panels/EasterEggPanel';
 
 export const VillageView: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -61,7 +62,11 @@ export const VillageView: React.FC = () => {
         const zone = useGameStore.getState().currentZone;
         if (zone) {
           e.preventDefault();
-          soundEffects.playEnter();
+          if (zone.id.startsWith('secret-chest-')) {
+            soundEffects.playChestChime();
+          } else {
+            soundEffects.playEnter();
+          }
           useGameStore.getState().markVisited(zone.id);
           if (zone.panel) {
             useGameStore.getState().openPanel(zone.panel, zone.projectId);
@@ -98,6 +103,8 @@ export const VillageView: React.FC = () => {
         return 'GitHub Workshop: Interactive Terminal';
       case 'ai-chat':
         return 'Tanish AI Companion';
+      case 'easter-egg':
+        return 'Village Secret: Golden Chest';
       default:
         return 'Village Place';
     }
@@ -189,6 +196,7 @@ export const VillageView: React.FC = () => {
         {activePanel === 'guestbook' && <GuestbookPanel />}
         {activePanel === 'terminal' && <TerminalPanel />}
         {activePanel === 'ai-chat' && <AiChatPanel />}
+        {activePanel === 'easter-egg' && <EasterEggPanel />}
       </Modal>
     </div>
   );

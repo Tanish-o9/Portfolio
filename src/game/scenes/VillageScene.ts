@@ -349,6 +349,19 @@ export class VillageScene extends Phaser.Scene {
       lamp.setDepth(ly);
     });
 
+    // Secret Golden Easter Egg Chests
+    const chest1 = this.add.image(70, 430, 'prop_chest');
+    chest1.setOrigin(0.5, 0.85);
+    chest1.setDepth(430);
+
+    const chest2 = this.add.image(1390, 190, 'prop_chest');
+    chest2.setOrigin(0.5, 0.85);
+    chest2.setDepth(190);
+
+    const chest3 = this.add.image(880, 830, 'prop_chest');
+    chest3.setOrigin(0.5, 0.85);
+    chest3.setDepth(830);
+
     // Trees
     const treeLocs = [
       [50, 40], [320, 60], [440, 80], [820, 40], [980, 40],
@@ -473,6 +486,8 @@ export class VillageScene extends Phaser.Scene {
 
   private createPlaceBadges() {
     PLACES.forEach((place) => {
+      if (place.id.startsWith('secret-chest-')) return;
+
       let badgeX = place.zone.x + place.zone.width / 2;
       let badgeY = place.zone.y - 18;
 
@@ -938,7 +953,11 @@ export class VillageScene extends Phaser.Scene {
     // Click to enter directly
     this.promptContainer.on('pointerdown', () => {
       if (this.nearestPlace) {
-        soundEffects.playEnter();
+        if (this.nearestPlace.id.startsWith('secret-chest-')) {
+          soundEffects.playChestChime();
+        } else {
+          soundEffects.playEnter();
+        }
         this.spawnSparkles(this.nearestPlace.doorPoint.x, this.nearestPlace.doorPoint.y, 0xf6b73c);
         useGameStore.getState().markVisited(this.nearestPlace.id);
         if (this.nearestPlace.panel) {
@@ -1038,7 +1057,11 @@ export class VillageScene extends Phaser.Scene {
       const justEnter = Phaser.Input.Keyboard.JustDown(this.enterKey);
 
       if (justE || justEnter) {
-        soundEffects.playEnter();
+        if (currentNearby.id.startsWith('secret-chest-')) {
+          soundEffects.playChestChime();
+        } else {
+          soundEffects.playEnter();
+        }
         this.spawnSparkles(currentNearby.doorPoint.x, currentNearby.doorPoint.y, 0xf6b73c);
         useGameStore.getState().markVisited(currentNearby.id);
         if (currentNearby.panel) {

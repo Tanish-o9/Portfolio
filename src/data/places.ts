@@ -9,6 +9,7 @@ export type PanelType =
   | 'guestbook'
   | 'terminal'
   | 'ai-chat'
+  | 'easter-egg'
   | null;
 
 export interface PlaceZone {
@@ -177,5 +178,38 @@ export const PLACES: Place[] = [
     doorPoint: { x: 685, y: 395 },
     roofColor: '#00F0FF',
     description: 'Ask questions about Tanish, projects, benchmarks, and skills in real time.',
+  },
+  {
+    id: 'secret-chest-1',
+    name: 'Secret Chest: GPU Playbook',
+    label: '✨ Secret Chest · GPU Playbook',
+    panel: 'easter-egg',
+    projectId: 'chest-1',
+    zone: { x: 55, y: 415, width: 36, height: 36 },
+    doorPoint: { x: 70, y: 435 },
+    roofColor: '#F6B73C',
+    description: "Secret Easter Egg: Tanish's LLM Inference & GPU Optimization Playbook.",
+  },
+  {
+    id: 'secret-chest-2',
+    name: 'Secret Chest: Biometric Journey',
+    label: '✨ Secret Chest · Biometric Journey',
+    panel: 'easter-egg',
+    projectId: 'chest-2',
+    zone: { x: 1375, y: 175, width: 36, height: 36 },
+    doorPoint: { x: 1390, y: 195 },
+    roofColor: '#7B6BC4',
+    description: "Secret Easter Egg: The engineering story behind Pramaan.ai's 0.942 ROC-AUC.",
+  },
+  {
+    id: 'secret-chest-3',
+    name: 'Secret Chest: Founder Mode',
+    label: '✨ Secret Chest · Founder Mode',
+    panel: 'easter-egg',
+    projectId: 'chest-3',
+    zone: { x: 865, y: 815, width: 36, height: 36 },
+    doorPoint: { x: 880, y: 835 },
+    roofColor: '#00F0FF',
+    description: 'Secret Easter Egg: Founder Mode & unlock Cyber Gold customizer style.',
   },
 ];

@@ -552,6 +552,22 @@ export class PreloadScene extends Phaser.Scene {
     koi.fillCircle(14.5, 5, 0.8);
     koi.generateTexture('prop_koi_fish', 20, 12);
     koi.destroy();
+
+    // 15. Golden Secret Treasure Chest
+    const chest = this.make.graphics({ x: 0, y: 0 });
+    chest.fillStyle(0x3a2a1e, 1);
+    chest.fillRoundedRect(0, 0, 24, 20, 4);
+    chest.fillStyle(0x995d3f, 1);
+    chest.fillRoundedRect(2, 2, 20, 16, 3);
+    chest.fillStyle(0xf6b73c, 1);
+    chest.fillRect(2, 6, 20, 3);
+    chest.fillRect(5, 2, 3, 16);
+    chest.fillRect(16, 2, 3, 16);
+    chest.fillStyle(0x261a10, 1);
+    chest.fillCircle(12, 11, 2);
+    chest.fillRect(11, 11, 2, 3);
+    chest.generateTexture('prop_chest', 24, 20);
+    chest.destroy();
   }
 
   private createNpcTextures() {

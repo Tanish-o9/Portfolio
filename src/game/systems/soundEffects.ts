@@ -136,6 +136,28 @@ class SoundEffectsManager {
     });
   }
 
+  // Sparkling harp arpeggio for secret treasure chests
+  public playChestChime(): void {
+    const ctx = this.getContext();
+    const master = this.masterGain;
+    if (!ctx || !master) return;
+    const now = ctx.currentTime;
+    [440, 554.37, 659.25, 880, 1108.73, 1318.51].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+      gain.gain.setValueAtTime(0.08, now + idx * 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.35);
+
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(now + idx * 0.05);
+      osc.stop(now + idx * 0.05 + 0.35);
+    });
+  }
+
   // Cozy Lo-Fi Procedural Jukebox Tracks
   public static TRACKS = [
     { name: 'AKGEC Midnight Code', mood: 'Chill Lo-Fi' },
