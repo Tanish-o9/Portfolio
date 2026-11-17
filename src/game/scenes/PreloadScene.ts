@@ -537,6 +537,21 @@ export class PreloadScene extends Phaser.Scene {
     lily.fillCircle(7, 7, 1.5);
     lily.generateTexture('prop_lilypad', 18, 18);
     lily.destroy();
+
+    // 14. Swimming Golden Koi Fish
+    const koi = this.make.graphics({ x: 0, y: 0 });
+    // Orange fish body with white belly and red fins
+    koi.fillStyle(0xf6b73c, 1);
+    koi.fillEllipse(10, 6, 14, 7);
+    koi.fillStyle(0xe0674a, 1);
+    koi.fillTriangle(2, 6, 0, 2, 0, 10); // Tail fin
+    koi.fillTriangle(8, 2, 12, 2, 10, 0); // Dorsal fin
+    koi.fillStyle(0xffffff, 1);
+    koi.fillCircle(14, 5, 1.5); // Eye
+    koi.fillStyle(0x3a2a1e, 1);
+    koi.fillCircle(14.5, 5, 0.8);
+    koi.generateTexture('prop_koi_fish', 20, 12);
+    koi.destroy();
   }
 
   private createNpcTextures() {

@@ -14,6 +14,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     S: Phaser.Input.Keyboard.Key;
     D: Phaser.Input.Keyboard.Key;
   };
+  private shiftKey?: Phaser.Input.Keyboard.Key;
+  private lastDustTime = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'player_front');
@@ -40,6 +42,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (scene.input.keyboard) {
       this.cursors = scene.input.keyboard.createCursorKeys();
       this.wasdKeys = scene.input.keyboard.addKeys('W,A,S,D') as typeof this.wasdKeys;
+      this.shiftKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
     }
   }
 
@@ -93,9 +96,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       vy *= invMag;
     }
 
-    this.setVelocity(vx * this.speed, vy * this.speed);
+    // Sprinting mechanics (Hold Shift to sprint at 280 speed)
+    const isSprinting = this.shiftKey?.isDown ?? false;
+    const currentSpeed = isSprinting ? 270 : 190;
+    this.setVelocity(vx * currentSpeed, vy * currentSpeed);
 
-    // Directional textures and visual tilt
+    // Directional textures
     if (vy < 0) {
       this.setTexture('player_back');
       this.setFlipX(false);
@@ -110,19 +116,46 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.setFlipX(false);
     }
 
-    // Walking animation wobble & footstep sound
-    if (vx !== 0 || vy !== 0) {
-      this.angle = Math.sin(this.scene.time.now / 100) * 4;
+    const isMoving = vx !== 0 || vy !== 0;
+
+    // Juicy Walk Animation: Squash & Stretch + Bounce
+    if (isMoving) {
+      const bounceFreq = isSprinting ? 65 : 85;
+      const walkPhase = Math.sin(this.scene.time.now / bounceFreq);
+
+      // Squash and stretch
+      this.scaleY = 1 + walkPhase * 0.12;
+      this.scaleX = (this.flipX ? -1 : 1) * (1 - walkPhase * 0.08);
+      this.angle = walkPhase * (isSprinting ? 8 : 4.5);
+
+      // Dynamic shadow scale following jump
+      this.shadow.setScale(1 - walkPhase * 0.12, 1 - walkPhase * 0.12);
+
+      // Kick up dust particles
+      const now = Date.now();
+      if (now - this.lastDustTime > (isSprinting ? 120 : 180)) {
+        this.lastDustTime = now;
+        const vs = this.scene as unknown as { addDustParticle?: (x: number, y: number) => void };
+        if (vs.addDustParticle) {
+          vs.addDustParticle(this.x + (Math.random() - 0.5) * 8, this.y + 18);
+        }
+      }
+
       soundEffects.playFootstep();
     } else {
+      // Idle Breathing Cycle
+      const breathe = Math.sin(this.scene.time.now / 380) * 0.04;
+      this.scaleY = 1 + breathe;
+      this.scaleX = (this.flipX ? -1 : 1) * (1 - breathe * 0.6);
       this.angle = 0;
+      this.shadow.setScale(1, 1);
     }
 
     // Keep shadow glued to feet
     this.shadow.setPosition(this.x, this.y + 20);
     this.shadow.setDepth(this.y - 1);
 
-    // Companion pet logic & smooth trailing
+    // Companion pet logic & banking physics
     const { pet, hoodieColor } = useGameStore.getState();
     if (pet === 'none') {
       this.petSprite.setVisible(false);
@@ -133,14 +166,17 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.petSprite.setTexture(textureKey);
       }
 
-      const targetPetX = this.flipX ? this.x + 22 : this.x - 22;
-      const bob = pet === 'drone' ? Math.sin(this.scene.time.now / 180) * 4 : 0;
+      const targetPetX = this.flipX ? this.x + 24 : this.x - 24;
+      const bob = pet === 'drone' ? Math.sin(this.scene.time.now / 160) * 5 : (isMoving ? Math.sin(this.scene.time.now / 80) * 2 : 0);
       const targetPetY = this.y + (pet === 'drone' ? -8 : 12) + bob;
 
-      this.petSprite.x += (targetPetX - this.petSprite.x) * 0.14;
-      this.petSprite.y += (targetPetY - this.petSprite.y) * 0.14;
+      this.petSprite.x += (targetPetX - this.petSprite.x) * 0.16;
+      this.petSprite.y += (targetPetY - this.petSprite.y) * 0.16;
       this.petSprite.setDepth(this.y + 2);
       this.petSprite.setFlipX(this.flipX);
+
+      // Bank into turn
+      this.petSprite.angle = vx * (pet === 'drone' ? 15 : 6);
     }
 
     // Custom hoodie color tint

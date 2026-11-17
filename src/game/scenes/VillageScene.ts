@@ -26,6 +26,16 @@ export class VillageScene extends Phaser.Scene {
   private promptBg!: Phaser.GameObjects.Rectangle;
   private arrowGraphic!: Phaser.GameObjects.Graphics;
 
+  // Animated world systems
+  private trees: Phaser.GameObjects.Image[] = [];
+  private npcs: Phaser.GameObjects.Image[] = [];
+  private badgeContainers: Array<{ container: Phaser.GameObjects.Container; baseY: number; phase: number }> = [];
+  private koiFish: Array<{ sprite: Phaser.GameObjects.Image; angle: number; speed: number; radiusX: number; radiusY: number }> = [];
+  private birds: Array<{ x: number; y: number; vx: number; vy: number; wingPhase: number }> = [];
+  private npcBubbles: Map<string, { container: Phaser.GameObjects.Container; targetX: number; targetY: number; visible: boolean }> = new Map();
+  private dustPuffs: Array<{ x: number; y: number; vx: number; vy: number; alpha: number; size: number }> = [];
+  private sparkles: Array<{ x: number; y: number; vx: number; vy: number; alpha: number; color: number; size: number }> = [];
+
   // Drag-to-pan / cursor slide state
   private isDragging = false;
   private dragStartX = 0;
@@ -33,6 +43,35 @@ export class VillageScene extends Phaser.Scene {
   private isFollowActive = true;
   private fxGraphics!: Phaser.GameObjects.Graphics;
   private particles: AmbientParticle[] = [];
+
+  public addDustParticle(x: number, y: number) {
+    if (this.dustPuffs.length < 25) {
+      this.dustPuffs.push({
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: -0.2 - Math.random() * 0.3,
+        alpha: 0.55,
+        size: 3.5,
+      });
+    }
+  }
+
+  public spawnSparkles(x: number, y: number, color = 0xf6b73c) {
+    for (let i = 0; i < 12; i++) {
+      const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.3;
+      const spd = 1.2 + Math.random() * 1.8;
+      this.sparkles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd,
+        alpha: 1,
+        color,
+        size: 3 + Math.random() * 2,
+      });
+    }
+  }
 
   constructor() {
     super({ key: 'VillageScene' });
@@ -279,6 +318,7 @@ export class VillageScene extends Phaser.Scene {
       const tree = this.add.image(tx, ty, key);
       tree.setOrigin(0.5, 0.9);
       tree.setDepth(ty);
+      this.trees.push(tree);
       const trunk = this.obstacles.create(tx, ty, undefined) as Phaser.Physics.Arcade.Sprite;
       trunk.setVisible(false);
       trunk.setSize(20, 14);
@@ -307,6 +347,8 @@ export class VillageScene extends Phaser.Scene {
     const postNpc = this.add.image(760, 760, 'npc_postmaster');
     postNpc.setOrigin(0.5, 0.9);
     postNpc.setDepth(760);
+
+    this.npcs.push(aiNpc, libNpc, postNpc);
 
     // 4. Rich Environment Props (Town Square Fountain, Benches, Gardens, Fences)
     // Town Square Fountain Centerpiece
@@ -361,6 +403,27 @@ export class VillageScene extends Phaser.Scene {
     const lily2 = this.add.image(1315, 735, 'prop_lilypad');
     lily2.setOrigin(0.5, 0.5);
     lily2.setDepth(740);
+
+    // Swimming Golden Koi Fish in Pond
+    const koi1 = this.add.image(1270, 715, 'prop_koi_fish');
+    koi1.setOrigin(0.5, 0.5);
+    koi1.setDepth(725);
+    this.koiFish.push({ sprite: koi1, angle: 0, speed: 0.016, radiusX: 38, radiusY: 22 });
+
+    const koi2 = this.add.image(1310, 725, 'prop_koi_fish');
+    koi2.setOrigin(0.5, 0.5);
+    koi2.setDepth(725);
+    this.koiFish.push({ sprite: koi2, angle: Math.PI, speed: 0.02, radiusX: 30, radiusY: 18 });
+
+    // Interactive Speech Bubbles for NPCs
+    this.createNpcSpeechBubbles();
+
+    // Flying Sky Birds System
+    this.birds = [
+      { x: 100, y: 130, vx: 1.15, vy: 0.16, wingPhase: 0 },
+      { x: 500, y: 170, vx: 1.35, vy: 0.12, wingPhase: 1.6 },
+      { x: 920, y: 120, vx: 1.25, vy: 0.2, wingPhase: 3.1 },
+    ];
 
     // 5. Interactive World-Space Badges for all Buildings (Ultra-Crisp & High Contrast)
     this.createPlaceBadges();
@@ -477,6 +540,106 @@ export class VillageScene extends Phaser.Scene {
           }
         }
       });
+
+      this.badgeContainers.push({
+        container,
+        baseY: badgeY,
+        phase: PLACES.indexOf(place) * 0.75,
+      });
+    });
+  }
+
+  private createNpcSpeechBubbles() {
+    const bubbleConfigs = [
+      { id: 'tanish', x: 685, y: 340, text: '👋 Hi! Ask me about QUANTORA, RAG & LLMs!' },
+      { id: 'librarian', x: 640, y: 175, text: '📚 7 Skill Bookshelves Inside!' },
+      { id: 'postmaster', x: 760, y: 715, text: '📬 Looking to Hire or Connect? Drop a Message!' },
+    ];
+
+    bubbleConfigs.forEach((cfg) => {
+      const bubble = this.add.container(cfg.x, cfg.y);
+      bubble.setDepth(2900);
+      bubble.setScale(0.7);
+      bubble.setAlpha(0);
+
+      const label = this.add.text(0, -2, cfg.text, {
+        fontFamily: 'Fredoka, Nunito, system-ui, sans-serif',
+        fontSize: '12px',
+        color: '#261A10',
+        fontStyle: 'bold',
+        resolution: 3,
+      });
+      label.setOrigin(0.5, 0.5);
+
+      const bw = label.width + 24;
+      const bh = 28;
+
+      const bg = this.add.graphics();
+      // Drop shadow
+      bg.fillStyle(0x261a10, 0.9);
+      bg.fillRoundedRect(-bw / 2, -bh / 2 + 3, bw, bh, 14);
+      // Pill fill
+      bg.fillStyle(0xfff6e3, 1);
+      bg.fillRoundedRect(-bw / 2, -bh / 2, bw, bh, 14);
+      // Outline
+      bg.lineStyle(2, 0x261a10, 1);
+      bg.strokeRoundedRect(-bw / 2, -bh / 2, bw, bh, 14);
+      // Little speech tail
+      bg.fillStyle(0xfff6e3, 1);
+      bg.fillTriangle(-5, bh / 2, 5, bh / 2, 0, bh / 2 + 6);
+      bg.lineStyle(2, 0x261a10, 1);
+      bg.beginPath();
+      bg.moveTo(-5, bh / 2);
+      bg.lineTo(0, bh / 2 + 6);
+      bg.lineTo(5, bh / 2);
+      bg.strokePath();
+
+      bubble.add([bg, label]);
+      this.npcBubbles.set(cfg.id, {
+        container: bubble,
+        targetX: cfg.x,
+        targetY: cfg.y,
+        visible: false,
+      });
+    });
+  }
+
+  private updateNpcBubbles() {
+    const playerPos = new Phaser.Math.Vector2(this.player.x, this.player.y);
+    const npcPositions: Record<string, { x: number; y: number }> = {
+      tanish: { x: 685, y: 390 },
+      librarian: { x: 640, y: 220 },
+      postmaster: { x: 760, y: 760 },
+    };
+
+    this.npcBubbles.forEach((bubble, id) => {
+      const npcPos = npcPositions[id];
+      if (!npcPos) return;
+      const dist = playerPos.distance(new Phaser.Math.Vector2(npcPos.x, npcPos.y));
+
+      if (dist < 95 && !bubble.visible) {
+        bubble.visible = true;
+        this.tweens.killTweensOf(bubble.container);
+        this.tweens.add({
+          targets: bubble.container,
+          scale: 1,
+          alpha: 1,
+          y: bubble.targetY - 6,
+          duration: 240,
+          ease: 'Back.easeOut',
+        });
+      } else if (dist >= 115 && bubble.visible) {
+        bubble.visible = false;
+        this.tweens.killTweensOf(bubble.container);
+        this.tweens.add({
+          targets: bubble.container,
+          scale: 0.7,
+          alpha: 0,
+          y: bubble.targetY,
+          duration: 180,
+          ease: 'Sine.easeIn',
+        });
+      }
     });
   }
 
@@ -574,29 +737,105 @@ export class VillageScene extends Phaser.Scene {
     this.fxGraphics.lineStyle(1.5, 0xffffff, 0.35);
     this.fxGraphics.strokeEllipse(1290, 720, rippleRadius * 2, rippleRadius * 1.2);
 
-    // Animated Fountain Water Sprays
-    const fTime = this.time.now / 160;
-    for (let i = 0; i < 4; i++) {
-      const angle = (i * Math.PI) / 2 + fTime * 0.6;
-      const fDropX = 630 + Math.cos(angle) * 8;
-      const fDropY = 405 - Math.abs(Math.sin(fTime + i)) * 10;
-      this.fxGraphics.fillStyle(0xffffff, 0.9);
-      this.fxGraphics.fillCircle(fDropX, fDropY, 2);
+    // Animated Fountain Water Sprays with Cascading Drops & Basin Ripples
+    const fTime = this.time.now / 150;
+    for (let i = 0; i < 5; i++) {
+      const angle = (i * Math.PI) / 2.5 + fTime * 0.5;
+      const fDropX = 630 + Math.cos(angle) * 10;
+      const fDropY = 405 - Math.abs(Math.sin(fTime + i * 0.8)) * 12;
+      this.fxGraphics.fillStyle(0xffffff, 0.95);
+      this.fxGraphics.fillCircle(fDropX, fDropY, 2.2);
+
+      // Expanding ripples on the water basin
+      const rPhase = ((this.time.now / 600) + i * 0.25) % 1;
+      this.fxGraphics.lineStyle(1.5, 0x7ccbea, (1 - rPhase) * 0.75);
+      this.fxGraphics.strokeEllipse(630, 424, rPhase * 28, rPhase * 10);
     }
 
-    // Animated Fluttering Butterflies over flowerbeds
-    const bTime = this.time.now / 350;
-    const b1x = 240 + Math.sin(bTime) * 18;
-    const b1y = 220 + Math.cos(bTime * 2) * 8;
-    this.fxGraphics.fillStyle(0xf6b73c, 0.95);
-    this.fxGraphics.fillEllipse(b1x - 2.5, b1y, 3, 2);
-    this.fxGraphics.fillEllipse(b1x + 2.5, b1y, 3, 2);
+    // Animated Fluttering Butterflies over flowerbeds (with real flapping wings)
+    const bTime = this.time.now / 320;
+    const wingFlap = Math.max(0.15, Math.abs(Math.sin(this.time.now / 45)));
 
-    const b2x = 740 + Math.cos(bTime * 0.8) * 20;
-    const b2y = 215 + Math.sin(bTime * 1.6) * 10;
+    // Butterfly 1: Golden Yellow near Home's Garden
+    const b1x = 240 + Math.sin(bTime) * 22;
+    const b1y = 220 + Math.cos(bTime * 2) * 10;
+    this.fxGraphics.fillStyle(0xf6b73c, 0.95);
+    this.fxGraphics.fillEllipse(b1x - 3 * wingFlap, b1y, 4 * wingFlap, 2.5);
+    this.fxGraphics.fillEllipse(b1x + 3 * wingFlap, b1y, 4 * wingFlap, 2.5);
+
+    // Butterfly 2: Electric Cyan near Library
+    const b2x = 740 + Math.cos(bTime * 0.8) * 24;
+    const b2y = 215 + Math.sin(bTime * 1.6) * 12;
     this.fxGraphics.fillStyle(0x00f0ff, 0.95);
-    this.fxGraphics.fillEllipse(b2x - 2.5, b2y, 3, 2);
-    this.fxGraphics.fillEllipse(b2x + 2.5, b2y, 3, 2);
+    this.fxGraphics.fillEllipse(b2x - 3 * wingFlap, b2y, 4 * wingFlap, 2.5);
+    this.fxGraphics.fillEllipse(b2x + 3 * wingFlap, b2y, 4 * wingFlap, 2.5);
+
+    // Butterfly 3: Ruby Coral near Workshop
+    const b3x = 1010 + Math.sin(bTime * 1.1) * 20;
+    const b3y = 485 + Math.cos(bTime * 1.4) * 10;
+    this.fxGraphics.fillStyle(0xe0674a, 0.95);
+    this.fxGraphics.fillEllipse(b3x - 3 * wingFlap, b3y, 4 * wingFlap, 2.5);
+    this.fxGraphics.fillEllipse(b3x + 3 * wingFlap, b3y, 4 * wingFlap, 2.5);
+
+    // Animated Birds Flying Across the Sky
+    for (const bird of this.birds) {
+      bird.x += bird.vx;
+      bird.y += bird.vy;
+      bird.wingPhase += 0.22;
+
+      // Wrap around when off-screen
+      if (bird.x > 1520) {
+        bird.x = -60;
+        bird.y = 80 + Math.random() * 260;
+        bird.vx = 1.0 + Math.random() * 0.5;
+        bird.vy = (Math.random() - 0.5) * 0.3;
+      }
+
+      const wingY = Math.sin(bird.wingPhase) * 3.5;
+      // Soft ground shadow
+      this.fxGraphics.fillStyle(0x000000, 0.12);
+      this.fxGraphics.fillEllipse(bird.x, bird.y + 110, 8, 3.5);
+
+      // Bird silhouette (flapping wings V-shape)
+      this.fxGraphics.lineStyle(2, 0x3a2a1e, 0.85);
+      this.fxGraphics.beginPath();
+      this.fxGraphics.moveTo(bird.x - 7, bird.y - wingY);
+      this.fxGraphics.lineTo(bird.x, bird.y);
+      this.fxGraphics.lineTo(bird.x + 7, bird.y - wingY);
+      this.fxGraphics.strokePath();
+    }
+
+    // Walking Dust Puff Particles
+    for (let i = this.dustPuffs.length - 1; i >= 0; i--) {
+      const d = this.dustPuffs[i];
+      d.x += d.vx;
+      d.y += d.vy;
+      d.alpha -= 0.03;
+      d.size += 0.06;
+      if (d.alpha <= 0) {
+        this.dustPuffs.splice(i, 1);
+        continue;
+      }
+      this.fxGraphics.fillStyle(0xd5c8b2, d.alpha);
+      this.fxGraphics.fillCircle(d.x, d.y, d.size);
+    }
+
+    // Interactive Sparkle Bursts
+    for (let i = this.sparkles.length - 1; i >= 0; i--) {
+      const sp = this.sparkles[i];
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.vx *= 0.94;
+      sp.vy *= 0.94;
+      sp.alpha -= 0.028;
+      sp.size = Math.max(1, sp.size - 0.04);
+      if (sp.alpha <= 0) {
+        this.sparkles.splice(i, 1);
+        continue;
+      }
+      this.fxGraphics.fillStyle(sp.color, sp.alpha);
+      this.fxGraphics.fillCircle(sp.x, sp.y, sp.size);
+    }
   }
 
   private createInteractionUI() {
@@ -632,6 +871,33 @@ export class VillageScene extends Phaser.Scene {
   update() {
     this.player.update();
     this.updateAmbientParticles();
+    this.updateNpcBubbles();
+
+    // 1. Floating organic bobbing on building roof badges
+    const badgeTime = this.time.now / 480;
+    for (const b of this.badgeContainers) {
+      b.container.y = b.baseY + Math.sin(badgeTime + b.phase) * 3.5;
+    }
+
+    // 2. Natural wind swaying on trees
+    const windTime = this.time.now / 700;
+    for (let i = 0; i < this.trees.length; i++) {
+      this.trees[i].angle = Math.sin(windTime + i * 0.7) * 2.2;
+    }
+
+    // 3. Swimming Golden Koi Fish in pond
+    for (const fish of this.koiFish) {
+      fish.angle += fish.speed;
+      fish.sprite.x = 1290 + Math.cos(fish.angle) * fish.radiusX;
+      fish.sprite.y = 720 + Math.sin(fish.angle) * fish.radiusY;
+      fish.sprite.rotation = fish.angle + Math.PI / 2 + Math.sin(this.time.now / 80) * 0.18;
+    }
+
+    // 4. Idle breathing cycle on NPCs
+    const npcBreathe = Math.sin(this.time.now / 320) * 0.03;
+    for (const npc of this.npcs) {
+      npc.scaleY = 1 + npcBreathe;
+    }
 
     // Re-center follow on player movement
     if (this.player.body && (this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0)) {
@@ -668,6 +934,7 @@ export class VillageScene extends Phaser.Scene {
 
       if (justE || justEnter) {
         soundEffects.playEnter();
+        this.spawnSparkles(currentNearby.doorPoint.x, currentNearby.doorPoint.y, 0xf6b73c);
         useGameStore.getState().markVisited(currentNearby.id);
         if (currentNearby.panel) {
           useGameStore.getState().openPanel(currentNearby.panel, currentNearby.projectId);

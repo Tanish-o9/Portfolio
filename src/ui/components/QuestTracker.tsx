@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useGameStore, QuestId } from '../../state/gameStore';
 import { Target, CheckCircle2, Circle, ChevronDown, ChevronUp, Trophy, Sparkles } from 'lucide-react';
 import { soundEffects } from '../../game/systems/soundEffects';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface QuestDef {
   id: QuestId;
@@ -96,68 +97,76 @@ export const QuestTracker: React.FC = () => {
       </button>
 
       {/* Expanded Quest Menu */}
-      {isQuestTrackerOpen && (
-        <div className="mt-2 w-72 sm:w-80 bg-[#FFF6E3] border-[3px] border-[#3A2A1E] rounded-2xl p-4 shadow-[0_6px_0_#3A2A1E] text-[#4A382B] animate-in fade-in zoom-in-95 duration-150">
-          <div className="flex items-center justify-between pb-2 border-b-2 border-[#3A2A1E]/20 mb-3">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#F6B73C]" />
-              <h4 className="text-sm font-extrabold text-[#3A2A1E]">Village Explorer Quests</h4>
-            </div>
-            <span className="text-xs font-mono font-bold text-[#266F73]">
-              {Math.round((completedCount / QUEST_DEFS.length) * 100)}%
-            </span>
-          </div>
-
-          {/* Progress bar */}
-          <div className="w-full h-2.5 bg-white border border-[#3A2A1E]/30 rounded-full overflow-hidden p-0.5 mb-3">
-            <div
-              className="h-full bg-gradient-to-r from-[#4F8CFF] via-[#F6B73C] to-[#10B981] rounded-full transition-all duration-500"
-              style={{ width: `${(completedCount / QUEST_DEFS.length) * 100}%` }}
-            />
-          </div>
-
-          {/* Quest items list */}
-          <div className="space-y-2">
-            {QUEST_DEFS.map((q) => {
-              const done = quests[q.id];
-              return (
-                <div
-                  key={q.id}
-                  onClick={() => handleQuestClick(q)}
-                  className={`p-2 rounded-xl border flex items-start gap-2.5 cursor-pointer transition-all ${
-                    done
-                      ? 'bg-emerald-50 border-emerald-300 text-emerald-900 opacity-90'
-                      : 'bg-white border-[#3A2A1E]/20 hover:border-[#3A2A1E] hover:bg-[#FFF]'
-                  }`}
-                >
-                  {done ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  ) : (
-                    <Circle className="w-4 h-4 text-[#3A2A1E]/40 shrink-0 mt-0.5" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className={`text-xs font-bold leading-tight ${done ? 'line-through text-emerald-800' : 'text-[#3A2A1E]'}`}>
-                      {q.title}
-                    </div>
-                    <div className="text-[10px] text-[#4A382B]/80 truncate">
-                      {q.desc}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {isAllComplete && (
-            <div className="mt-3 p-2.5 bg-[#F6B73C]/20 border-2 border-[#F6B73C] rounded-xl text-center">
-              <span className="text-xs font-extrabold text-[#3A2A1E] flex items-center justify-center gap-1.5">
-                <Trophy className="w-4 h-4 text-[#F6B73C]" />
-                All Quests Complete! Master AI Engineer
+      <AnimatePresence>
+        {isQuestTrackerOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: -8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: -6 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 420 }}
+            className="mt-2 w-72 sm:w-80 bg-[#FFF6E3] border-[3px] border-[#3A2A1E] rounded-2xl p-4 shadow-[0_6px_0_#3A2A1E] text-[#4A382B]"
+          >
+            <div className="flex items-center justify-between pb-2 border-b-2 border-[#3A2A1E]/20 mb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#F6B73C]" />
+                <h4 className="text-sm font-extrabold text-[#3A2A1E]">Village Explorer Quests</h4>
+              </div>
+              <span className="text-xs font-mono font-bold text-[#266F73]">
+                {Math.round((completedCount / QUEST_DEFS.length) * 100)}%
               </span>
             </div>
-          )}
-        </div>
-      )}
+
+            {/* Progress bar */}
+            <div className="w-full h-2.5 bg-white border border-[#3A2A1E]/30 rounded-full overflow-hidden p-0.5 mb-3">
+              <div
+                className="h-full bg-gradient-to-r from-[#4F8CFF] via-[#F6B73C] to-[#10B981] rounded-full transition-all duration-500"
+                style={{ width: `${(completedCount / QUEST_DEFS.length) * 100}%` }}
+              />
+            </div>
+
+            {/* Quest items list */}
+            <div className="space-y-2">
+              {QUEST_DEFS.map((q) => {
+                const done = quests[q.id];
+                return (
+                  <div
+                    key={q.id}
+                    onClick={() => handleQuestClick(q)}
+                    className={`p-2 rounded-xl border flex items-start gap-2.5 cursor-pointer transition-all ${
+                      done
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-900 opacity-90'
+                        : 'bg-white border-[#3A2A1E]/20 hover:border-[#3A2A1E] hover:bg-[#FFF] hover:scale-[1.02]'
+                    }`}
+                  >
+                    {done ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    ) : (
+                      <Circle className="w-4 h-4 text-[#3A2A1E]/40 shrink-0 mt-0.5" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-xs font-bold leading-tight ${done ? 'line-through text-emerald-800' : 'text-[#3A2A1E]'}`}>
+                        {q.title}
+                      </div>
+                      <div className="text-[10px] text-[#4A382B]/80 truncate">
+                        {q.desc}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {isAllComplete && (
+              <div className="mt-3 p-2.5 bg-[#F6B73C]/20 border-2 border-[#F6B73C] rounded-xl text-center">
+                <span className="text-xs font-extrabold text-[#3A2A1E] flex items-center justify-center gap-1.5">
+                  <Trophy className="w-4 h-4 text-[#F6B73C]" />
+                  All Quests Complete! Master AI Engineer
+                </span>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
