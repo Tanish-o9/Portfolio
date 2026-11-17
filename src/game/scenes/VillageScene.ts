@@ -23,7 +23,6 @@ export class VillageScene extends Phaser.Scene {
   private eKey!: Phaser.Input.Keyboard.Key;
   private promptContainer!: Phaser.GameObjects.Container;
   private promptText!: Phaser.GameObjects.Text;
-  private promptBg!: Phaser.GameObjects.Rectangle;
   private arrowGraphic!: Phaser.GameObjects.Graphics;
 
   // Animated world systems
@@ -225,6 +224,49 @@ export class VillageScene extends Phaser.Scene {
     roads.forEach((r) => {
       road.fillRect(r.x, r.y, r.w, r.h);
       road.strokeRect(r.x, r.y, r.w, r.h);
+    });
+
+    // Town Square Decorative Plaza Ring around Central Fountain
+    road.fillStyle(0xddcfb5, 1);
+    road.fillCircle(630, 420, 52);
+    road.lineStyle(2, 0xbdae92, 0.85);
+    road.strokeCircle(630, 420, 52);
+    road.strokeCircle(630, 420, 36);
+
+    // Stepping Stones connecting Roads to Building Doorsteps
+    road.fillStyle(0xeadfcb, 1);
+    road.lineStyle(2, 0xbdae92, 0.9);
+
+    const steppingStones = [
+      // To Home Door (170, 228) -> (184, 290)
+      [176, 245, 16, 12], [180, 265, 18, 14],
+      // To Library Door (660, 198) -> (676, 220)
+      [668, 206, 18, 12],
+      // To Cloud Tower Door (1150, 208) -> (1141, 250)
+      [1148, 222, 18, 12], [1146, 238, 18, 12],
+      // To College Door (180, 748) -> (184, 520)
+      [180, 730, 18, 14], [182, 705, 18, 14], [184, 680, 18, 14],
+      // To Post Office Door (675, 772) -> (676, 800)
+      [675, 786, 18, 12],
+      // To Workshop Door (1025, 758) -> (1036, 520)
+      [1028, 735, 18, 14], [1032, 710, 18, 14], [1034, 680, 18, 14],
+      // Project Street Doorsteps
+      [815, 388, 16, 9], [940, 388, 16, 9], [1065, 388, 16, 9], [1190, 388, 16, 9], [1315, 388, 16, 9],
+    ];
+
+    steppingStones.forEach(([sx, sy, sw, sh]) => {
+      road.fillRoundedRect(sx - sw / 2, sy - sh / 2, sw, sh, 5);
+      road.strokeRoundedRect(sx - sw / 2, sy - sh / 2, sw, sh, 5);
+    });
+
+    // Welcome Doormats at each Building Entrance
+    PLACES.forEach((p) => {
+      if (p.id === 'tanish-ai-npc' || p.id === 'guestbook-stand' || p.id === 'notice-board') return;
+      const matColor = parseInt(p.roofColor.replace('#', '0x'), 16);
+      road.fillStyle(matColor, 0.95);
+      road.fillRoundedRect(p.doorPoint.x - 14, p.doorPoint.y - 5, 28, 10, 3);
+      road.lineStyle(1.5, 0x261a10, 0.9);
+      road.strokeRoundedRect(p.doorPoint.x - 14, p.doorPoint.y - 5, 28, 10, 3);
     });
 
     // Authentic Cobblestone Texture Stones on Road
@@ -836,6 +878,18 @@ export class VillageScene extends Phaser.Scene {
       this.fxGraphics.fillStyle(sp.color, sp.alpha);
       this.fxGraphics.fillCircle(sp.x, sp.y, sp.size);
     }
+
+    // Sparkling Water Highlights on Fountain & Pond
+    const shimmer = Math.sin(this.time.now / 140);
+    if (shimmer > 0.4) {
+      this.fxGraphics.fillStyle(0xffffff, shimmer * 0.9);
+      // Pond shimmers
+      this.fxGraphics.fillCircle(1280, 712, 1.8);
+      this.fxGraphics.fillCircle(1325, 730, 2);
+      this.fxGraphics.fillCircle(1260, 725, 1.6);
+      // Fountain shimmers
+      this.fxGraphics.fillCircle(630, 420, 2.2);
+    }
   }
 
   private createInteractionUI() {
@@ -843,21 +897,62 @@ export class VillageScene extends Phaser.Scene {
     this.promptContainer.setDepth(9999);
     this.promptContainer.setVisible(false);
 
-    this.promptBg = this.add.rectangle(0, 0, 230, 36, 0xfff6e3);
-    this.promptBg.setStrokeStyle(2, 0x3a2a1e);
-    this.promptText = this.add.text(0, 0, 'Press E to Enter', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '12px',
-      color: '#3A2A1E',
-      fontStyle: 'bold',
+    // 3D Drop Shadow & Pill Background
+    const shadow = this.add.graphics();
+    shadow.fillStyle(0x261a10, 0.9);
+    shadow.fillRoundedRect(-120, -17, 240, 38, 19);
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0xfff6e3, 1);
+    bg.fillRoundedRect(-120, -19, 240, 36, 18);
+    bg.lineStyle(2.5, 0x261a10, 1);
+    bg.strokeRoundedRect(-120, -19, 240, 36, 18);
+
+    // Golden [ E ] Keyboard Key Pill Badge
+    const keyBadge = this.add.graphics();
+    keyBadge.fillStyle(0xf6b73c, 1);
+    keyBadge.fillRoundedRect(-108, -12, 28, 22, 6);
+    keyBadge.lineStyle(2, 0x261a10, 1);
+    keyBadge.strokeRoundedRect(-108, -12, 28, 22, 6);
+
+    const keyLabel = this.add.text(-94, -1, 'E', {
+      fontFamily: 'Fredoka, Nunito, system-ui, sans-serif',
+      fontSize: '13px',
+      color: '#261A10',
+      fontStyle: '800',
+      resolution: 3,
     }).setOrigin(0.5);
 
-    this.promptContainer.add([this.promptBg, this.promptText]);
+    this.promptText = this.add.text(12, -1, 'Enter Building', {
+      fontFamily: 'Fredoka, Nunito, system-ui, sans-serif',
+      fontSize: '13px',
+      color: '#261A10',
+      fontStyle: '800',
+      resolution: 3,
+    }).setOrigin(0.5);
+
+    this.promptContainer.add([shadow, bg, keyBadge, keyLabel, this.promptText]);
+    this.promptContainer.setSize(240, 38);
+    this.promptContainer.setInteractive({ useHandCursor: true });
+
+    // Click to enter directly
+    this.promptContainer.on('pointerdown', () => {
+      if (this.nearestPlace) {
+        soundEffects.playEnter();
+        this.spawnSparkles(this.nearestPlace.doorPoint.x, this.nearestPlace.doorPoint.y, 0xf6b73c);
+        useGameStore.getState().markVisited(this.nearestPlace.id);
+        if (this.nearestPlace.panel) {
+          useGameStore.getState().openPanel(this.nearestPlace.panel, this.nearestPlace.projectId);
+        } else if (this.nearestPlace.externalUrl) {
+          window.open(this.nearestPlace.externalUrl, '_blank', 'noopener,noreferrer');
+        }
+      }
+    });
 
     this.arrowGraphic = this.add.graphics();
     this.arrowGraphic.setDepth(9998);
     this.arrowGraphic.fillStyle(0xf6b73c, 1);
-    this.arrowGraphic.lineStyle(2, 0x3a2a1e, 1);
+    this.arrowGraphic.lineStyle(2, 0x261a10, 1);
     this.arrowGraphic.beginPath();
     this.arrowGraphic.moveTo(-8, -16);
     this.arrowGraphic.lineTo(8, -16);
@@ -904,14 +999,24 @@ export class VillageScene extends Phaser.Scene {
       this.recenterCamera();
     }
 
-    // Check distance to interactive zones
+    // Check distance to interactive zones (Forgiving proximity & porch detection)
     let currentNearby: Place | null = null;
+    let closestDist = 9999;
     const playerFeet = new Phaser.Math.Vector2(this.player.x, this.player.y + 16);
 
-    for (const zb of this.zoneBoxes) {
-      if (zb.bounds.contains(playerFeet.x, playerFeet.y)) {
-        currentNearby = zb.place;
-        break;
+    for (const place of PLACES) {
+      const dPoint = new Phaser.Math.Vector2(place.doorPoint.x, place.doorPoint.y);
+      const dist = playerFeet.distance(dPoint);
+
+      const inFrontOfBuilding =
+        playerFeet.x >= place.zone.x - 30 &&
+        playerFeet.x <= place.zone.x + place.zone.width + 30 &&
+        playerFeet.y >= place.zone.y + place.zone.height - 30 &&
+        playerFeet.y <= place.zone.y + place.zone.height + 85;
+
+      if ((dist < 85 || inFrontOfBuilding) && dist < closestDist) {
+        currentNearby = place;
+        closestDist = dist;
       }
     }
 
@@ -921,12 +1026,12 @@ export class VillageScene extends Phaser.Scene {
     }
 
     if (currentNearby) {
-      this.promptContainer.setPosition(this.player.x, this.player.y - 40);
-      this.promptText.setText(`Press E · Enter ${currentNearby.name}`);
+      this.promptContainer.setPosition(this.player.x, this.player.y - 44);
+      this.promptText.setText(`Enter ${currentNearby.name}`);
       this.promptContainer.setVisible(true);
 
       const bobY = Math.sin(this.time.now / 150) * 4;
-      this.arrowGraphic.setPosition(currentNearby.doorPoint.x, currentNearby.doorPoint.y - 20 + bobY);
+      this.arrowGraphic.setPosition(currentNearby.doorPoint.x, currentNearby.doorPoint.y - 18 + bobY);
       this.arrowGraphic.setVisible(true);
 
       const justE = Phaser.Input.Keyboard.JustDown(this.eKey);
@@ -938,6 +1043,8 @@ export class VillageScene extends Phaser.Scene {
         useGameStore.getState().markVisited(currentNearby.id);
         if (currentNearby.panel) {
           useGameStore.getState().openPanel(currentNearby.panel, currentNearby.projectId);
+        } else if (currentNearby.externalUrl) {
+          window.open(currentNearby.externalUrl, '_blank', 'noopener,noreferrer');
         }
       }
     } else {

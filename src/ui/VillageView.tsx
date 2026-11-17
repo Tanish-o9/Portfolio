@@ -2,13 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import { createGame } from '../game/main';
 import { useGameStore } from '../state/gameStore';
+import { soundEffects } from '../game/systems/soundEffects';
 import { Hud } from './components/Hud';
 import { Minimap } from './components/Minimap';
 import { Joystick } from './components/Joystick';
 import { QuestTracker } from './components/QuestTracker';
 import { Modal } from './components/Modal';
 import { IntroModal } from './components/IntroModal';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Bot } from 'lucide-react';
 
 import { AboutPanel } from './panels/AboutPanel';
 import { ProjectPanel } from './panels/ProjectPanel';
@@ -20,7 +21,6 @@ import { ResumePanel } from './panels/ResumePanel';
 import { GuestbookPanel } from './panels/GuestbookPanel';
 import { TerminalPanel } from './panels/TerminalPanel';
 import { AiChatPanel } from './panels/AiChatPanel';
-import { Bot } from 'lucide-react';
 
 export const VillageView: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,6 +39,42 @@ export const VillageView: React.FC = () => {
       gameRef.current = null;
     };
   }, []);
+
+  // Global Keydown Listener for 'E', 'e', 'Enter', and 'Space'
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // If a modal dialog is already open, do not intercept
+      if (activePanel !== null) return;
+
+      // Do not intercept if user is typing in an input or textarea
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (activeEl.tagName === 'INPUT' ||
+          activeEl.tagName === 'TEXTAREA' ||
+          activeEl.getAttribute('contenteditable') === 'true')
+      ) {
+        return;
+      }
+
+      if (e.key === 'e' || e.key === 'E' || e.key === 'Enter') {
+        const zone = useGameStore.getState().currentZone;
+        if (zone) {
+          e.preventDefault();
+          soundEffects.playEnter();
+          useGameStore.getState().markVisited(zone.id);
+          if (zone.panel) {
+            useGameStore.getState().openPanel(zone.panel, zone.projectId);
+          } else if (zone.externalUrl) {
+            window.open(zone.externalUrl, '_blank', 'noopener,noreferrer');
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activePanel]);
 
   const getPanelTitle = () => {
     switch (activePanel) {
@@ -93,16 +129,27 @@ export const VillageView: React.FC = () => {
       <Minimap />
       <Joystick />
 
-      {/* Floating Quick Action: Tanish AI Assistant - Lower Right Side */}
-      <div className="fixed bottom-6 right-6 md:bottom-[148px] md:right-4 z-30 pointer-events-auto">
+      {/* Floating Quick Action: Tanish AI Assistant - Lower Right Side (Above Minimap) */}
+      <div className="fixed bottom-6 right-6 md:bottom-[148px] md:right-4 z-30 pointer-events-auto flex flex-col items-end gap-1.5">
         <button
-          onClick={() => openPanel('ai-chat')}
-          className="flex items-center gap-2 px-3.5 py-2.5 bg-[#FFF6E3] hover:bg-[#FFF] border-2 border-[#3A2A1E] rounded-2xl shadow-[0_4px_0_#3A2A1E] text-xs font-bold text-[#3A2A1E] transition-transform active:translate-y-1 hover:scale-105"
-          title="Chat with Tanish AI"
+          onClick={() => {
+            soundEffects.playClick();
+            openPanel('ai-chat');
+          }}
+          className="group relative flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-[#FFF6E3] to-[#FFFBF2] hover:from-white hover:to-white border-[2.5px] border-[#3A2A1E] rounded-2xl shadow-[0_5px_0_#3A2A1E] text-xs font-extrabold text-[#3A2A1E] transition-all active:translate-y-1 active:shadow-none hover:scale-[1.03]"
+          title="Chat with Tanish AI Assistant"
         >
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <Bot className="w-4 h-4 text-[#266F73]" />
-          <span>Ask Tanish AI</span>
+          {/* Animated online status dot */}
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+          </span>
+
+          <div className="w-6 h-6 rounded-lg bg-[#266F73] text-white flex items-center justify-center border border-[#3A2A1E]/30 shadow-inner group-hover:rotate-6 transition-transform">
+            <Bot className="w-3.5 h-3.5" />
+          </div>
+
+          <span className="tracking-tight">Ask Tanish AI</span>
         </button>
       </div>
 
