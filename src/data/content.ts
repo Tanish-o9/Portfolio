@@ -74,7 +74,7 @@ export const resumeContent = {
     linkedin: "linkedin.com/in/tanish-kumar-61553b385",
     linkedinUrl: "https://www.linkedin.com/in/tanish-kumar-61553b385/",
     professionalSummary:
-      "AI Engineer focused on LLM inference optimization, agentic systems, and practical ML engineering. Built AI systems spanning GPU inference benchmarking, tool-calling agent evaluation, and multimodal biometric verification. Demonstrated 76% peak VRAM reduction through INT4 NF4 quantization, and developed evaluation workflows with measurable model and system metrics. Hands-on with Python, PyTorch, vLLM, PEFT/LoRA, LangGraph, RAG, FastAPI, Django, and React.",
+      "AI Engineer focused on LLM inference optimization, agentic systems, and practical machine learning engineering. Built systems for GPU inference benchmarking, tool-calling agent evaluation, and multimodal biometric verification. Achieved 76% peak VRAM reduction using INT4 NF4 quantization and developed evaluation workflows using measurable model and system metrics. Technical experience includes Python, PyTorch, vLLM, PEFT/LoRA, LangGraph, RAG, FastAPI, Django, and React.",
   } as PersonalInfo,
 
   aboutIntro: [
@@ -92,6 +92,8 @@ export const resumeContent = {
         "LLM Inference Optimization",
         "Quantization (INT8/INT4)",
         "PEFT/LoRA",
+        "LLM Evaluation",
+        "LLM Guardrails",
         "Hugging Face Transformers",
       ],
     },
@@ -100,10 +102,12 @@ export const resumeContent = {
       skills: [
         "LangChain",
         "LangGraph",
+        "CrewAI",
+        "Agno",
         "Multi-Agent Systems",
-        "RAG",
+        "Retrieval-Augmented Generation (RAG)",
         "Tool Calling",
-        "MCP",
+        "Model Context Protocol (MCP)",
         "AI Memory",
         "LLM Orchestration",
       ],
@@ -114,6 +118,9 @@ export const resumeContent = {
         "Machine Learning",
         "Deep Learning",
         "NLP",
+        "LSTM",
+        "GRU",
+        "Transformers",
         "PyTorch",
         "Scikit-learn",
         "Knowledge Distillation",
@@ -174,8 +181,8 @@ export const resumeContent = {
       college: "Ajay Kumar Garg Engineering College",
       duration: "October 2026 – Present",
       bullets: [
-        "Contribute to the Cell's AI/ML initiatives by translating practical problem statements into focused machine learning experiments and implementation tasks.",
-        "Apply ML concepts through hands-on experimentation and project-oriented development, evaluating approaches against each problem's requirements.",
+        "Translate practical problem statements into focused machine learning experiments and implementation tasks as part of the Cell’s AI/ML initiatives.",
+        "Apply machine learning concepts through hands-on experimentation and project-oriented development, evaluating approaches against each problem's requirements.",
         "Coordinate with fellow developers on technical approaches, implementation progress, and sharing findings to support collaborative AI/ML work.",
       ],
     },
@@ -372,6 +379,10 @@ export const resumeContent = {
   } as EducationItem,
 
   achievements: [
+    {
+      title: "Team Leadership",
+      description: "Guided a 6-member project team throughout development by explaining technical concepts, helping resolve implementation challenges, and coordinating team activities.",
+    },
     {
       title: "LeetCode Problem Solving",
       description: "Solved 100+ Data Structures and Algorithms problems.",

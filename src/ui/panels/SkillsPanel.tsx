@@ -40,7 +40,7 @@ const RAG_DATABASE: Array<Omit<RagChunk, 'score'>> = [
     id: 'education-leetcode',
     category: 'Algorithms & Education',
     title: 'AKGEC B.Tech CSE & 100+ LeetCode',
-    text: 'B.Tech in Computer Science & Engineering (2023–2027) at Ajay Kumar Garg Engineering College (AKGEC). Solved 100+ LeetCode problems demonstrating deep algorithmic proficiency in trees, graphs, dynamic programming, and systems design.',
+    text: 'B.Tech in Computer Science & Engineering (2025–2029) at Ajay Kumar Garg Engineering College (AKGEC). Solved 100+ LeetCode problems demonstrating deep algorithmic proficiency in trees, graphs, dynamic programming, and systems design.',
   },
 ];
 

@@ -37,11 +37,11 @@ function getAiResponse(query: string): string {
 
   if (q.includes('skill') || q.includes('stack') || q.includes('python') || q.includes('langgraph') || q.includes('pytorch')) {
     return `Tanish's verified core skill stack covers:
-• AI & LLM Engineering: LLMs, vLLM, Inference Optimization, INT8/INT4 Quantization, PEFT/LoRA, Transformers
-• Agentic AI: LangChain, LangGraph, Multi-Agent Systems, RAG, Tool Calling, MCP, AI Memory
-• ML/DL: PyTorch, Scikit-learn, Knowledge Distillation, Computer Vision, NLP
-• Backend: FastAPI, Django, REST APIs, JWT, PostgreSQL, MongoDB, Redis, FAISS, ChromaDB
-• Languages: Python, C++, C, JavaScript, TypeScript.`;
+• AI & LLM Engineering: LLMs, vLLM, LLM Inference Optimization, INT8/INT4 Quantization, PEFT/LoRA, LLM Evaluation, LLM Guardrails, Transformers
+• Agentic AI: LangChain, LangGraph, CrewAI, Agno, Multi-Agent Systems, RAG, Tool Calling, MCP, AI Memory, LLM Orchestration
+• ML/DL: PyTorch, Scikit-learn, LSTM, GRU, Transformers, Knowledge Distillation, Computer Vision, NLP
+• Backend: FastAPI, Django, REST APIs, JWT, PostgreSQL, MongoDB, Redis, FAISS, ChromaDB, Supabase
+• Languages: Python, C, C++, JavaScript, TypeScript.`;
   }
 
   if (q.includes('contact') || q.includes('email') || q.includes('hire') || q.includes('phone') || q.includes('reach')) {
